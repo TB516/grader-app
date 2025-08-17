@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@electron-toolkit/preload':
-        specifier: ^3.0.2
-        version: 3.0.2(electron@37.2.6)
       '@electron-toolkit/utils':
         specifier: ^4.0.0
         version: 4.0.0(electron@37.2.6)
@@ -168,11 +165,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  '@electron-toolkit/preload@3.0.2':
-    resolution: {integrity: sha512-TWWPToXd8qPRfSXwzf5KVhpXMfONaUuRAZJHsKthKgZR/+LqX1dZVSSClQ8OTAEduvLGdecljCsoT2jSshfoUg==}
-    peerDependencies:
-      electron: '>=13.0.0'
 
   '@electron-toolkit/tsconfig@1.0.1':
     resolution: {integrity: sha512-M0Mol3odspvtCuheyujLNAW7bXq7KFNYVMRtpjFa4ZfES4MuklXBC7Nli/omvc+PRKlrklgAGx3l4VakjNo8jg==}
@@ -2614,10 +2606,6 @@ snapshots:
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
-
-  '@electron-toolkit/preload@3.0.2(electron@37.2.6)':
-    dependencies:
-      electron: 37.2.6
 
   '@electron-toolkit/tsconfig@1.0.1(@types/node@22.17.1)':
     dependencies:
