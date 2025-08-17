@@ -1,7 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron';
+import { app, shell, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
+import setupIPC from './ipc-setup';
 
 function createWindow(): void {
   // Create the browser window.
@@ -49,8 +50,8 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'));
+  // Sets up all the IPC handlers for the main process to keep this file cleaner
+  setupIPC();
 
   createWindow();
 
