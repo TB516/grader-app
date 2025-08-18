@@ -48,6 +48,9 @@ importers:
       prettier-plugin-svelte:
         specifier: ^3.4.0
         version: 3.4.0(prettier@3.6.2)(svelte@5.38.1)
+      sv-router:
+        specifier: ^0.8.0
+        version: 0.8.0(svelte@5.38.1)
       svelte:
         specifier: ^5.36.10
         version: 5.38.1
@@ -2233,6 +2236,12 @@ packages:
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
+
+  sv-router@0.8.0:
+    resolution: {integrity: sha512-9AvEZ64uWMkH67jjINuP3TkmH27KTCeKOg9+LrXMgWuBbOkU2FQqw8woRnOkG20jSm8ZBc++7wChW00LcY11rg==}
+    hasBin: true
+    peerDependencies:
+      svelte: ^5
 
   svelte-check@4.3.1:
     resolution: {integrity: sha512-lkh8gff5gpHLjxIV+IaApMxQhTGnir2pNUAqcNgeKkvK5bT/30Ey/nzBxNLDlkztCH4dP7PixkMt9SWEKFPBWg==}
@@ -4820,6 +4829,11 @@ snapshots:
   supports-color@7.2.0:
     dependencies:
       has-flag: 4.0.0
+
+  sv-router@0.8.0(svelte@5.38.1):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.38.1
 
   svelte-check@4.3.1(picomatch@4.0.3)(svelte@5.38.1)(typescript@5.9.2):
     dependencies:

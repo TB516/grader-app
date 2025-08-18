@@ -36,6 +36,7 @@
     "eslint-plugin-svelte": "^3.11.0",
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
+    "sv-router": "^0.8.0",
     "svelte": "^5.36.10",
     "svelte-check": "^4.3.0",
     "typescript": "^5.8.3",
