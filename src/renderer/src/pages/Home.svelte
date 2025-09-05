@@ -4,7 +4,9 @@
   let projectUrl: string;
   let selectedProject: string;
 
-  const testProject = (): void => {};
+  const startTests = (): void => {
+    window.api.launchTester(selectedProject, projectUrl);
+  };
 </script>
 
 <main>
@@ -17,7 +19,7 @@
       {/each}
     </select>
 
-    <button onclick={testProject}>Test Project</button>
+    <button onclick={startTests}>Test Project</button>
   </form>
 </main>
 
