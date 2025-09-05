@@ -1,7 +1,6 @@
 <script lang="ts">
   import projects from '../../../../resources/projects.json';
 
-  let testing = false;
   let projectUrl: string;
   let selectedProject: string;
 
@@ -18,7 +17,7 @@
       {/each}
     </select>
 
-    <button onclick={testProject} disabled={testing}>Test Project</button>
+    <button onclick={testProject}>Test Project</button>
   </form>
 </main>
 
