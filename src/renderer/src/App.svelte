@@ -3,4 +3,4 @@
   import './router';
 </script>
 
-<Router />
+<Router base="#" />
