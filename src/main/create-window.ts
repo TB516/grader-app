@@ -36,9 +36,14 @@ function createWindow(hash: string = '/', query: Record<string, string> = {}): v
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    window.loadURL(
-      `${process.env['ELECTRON_RENDERER_URL']}#${hash}?${new URLSearchParams(query).toString()}`
-    );
+    let url = process.env['ELECTRON_RENDERER_URL'];
+
+    const queryParams = new URLSearchParams(query);
+    url += queryParams.size !== 0 ? `?=${queryParams.toString()}` : '';
+
+    url += `#${hash}`;
+
+    window.loadURL(url);
   } else {
     window.loadFile(join(__dirname, '../renderer/index.html'), { hash: hash, query: query });
   }
