@@ -5,10 +5,10 @@ import icon from '../../resources/icon.png?asset';
 
 /**
  * Creates a new app window
- * @param hash String value of the hash path value
+ * @param path String value of the hash path
  * @param query Record containing keys and values for the query parameters
  */
-function createWindow(hash: string = '/', query: Record<string, string> = {}): void {
+function createWindow(path: string = '/', query: Record<string, string> = {}): void {
   // Create the browser window.
   const window = new BrowserWindow({
     width: 900,
@@ -41,11 +41,11 @@ function createWindow(hash: string = '/', query: Record<string, string> = {}): v
     const queryParams = new URLSearchParams(query);
     url += queryParams.size !== 0 ? `?=${queryParams.toString()}` : '';
 
-    url += `#${hash}`;
+    url += `#${path}`;
 
     window.loadURL(url);
   } else {
-    window.loadFile(join(__dirname, '../renderer/index.html'), { hash: hash, query: query });
+    window.loadFile(join(__dirname, '../renderer/index.html'), { hash: path, query: query });
   }
 }
 
