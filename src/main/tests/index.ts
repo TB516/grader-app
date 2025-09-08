@@ -7,7 +7,20 @@ import { ProjectTypes } from '../../../resources/projects';
  * @param url Project URL
  */
 const testRouter = (assignment: ProjectTypes, url: string) => {
-  console.log(assignment, url);
+  switch (assignment) {
+    case 'Simple HTTP':
+      return;
+    case 'Streaming Media':
+      return;
+    case 'HTTP API I':
+      return;
+    case 'HTTP API II':
+      return;
+    case 'Domomaker C':
+      return;
+    case 'Domomaker E':
+      return;
+  }
 };
 
 export default testRouter;
