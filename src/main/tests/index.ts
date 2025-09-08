@@ -4,6 +4,6 @@
  * @param assignment Assignment to route by
  * @param url Project URL
  */
-const testRouter = (_e: Electron.IpcMainInvokeEvent, assignment: string, url: string) => {};
+const testRouter = (assignment: string, url: string) => {};
 
 export default testRouter;
