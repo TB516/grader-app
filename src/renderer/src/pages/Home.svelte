@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { projects } from '../../../../resources/projects';
+  import { projects, type ProjectTypes } from '../../../../resources/projects';
 
   let projectUrl: string;
-  let selectedProject: string;
+  let selectedProject: ProjectTypes;
 
   const startTests = (): void => {
     window.api.launchTester(selectedProject, projectUrl);
