@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { projects } from '../../../projects';
+  import { projects } from '../../../../resources/projects';
 
   let projectUrl: string;
   let selectedProject: string;
