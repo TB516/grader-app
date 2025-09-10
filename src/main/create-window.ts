@@ -39,7 +39,7 @@ function createWindow(path: string = '/', query: Record<string, string> = {}): v
     let url = process.env['ELECTRON_RENDERER_URL'];
 
     const queryParams = new URLSearchParams(query);
-    url += queryParams.size !== 0 ? `?=${queryParams.toString()}` : '';
+    url += queryParams.size !== 0 ? `?${queryParams.toString()}` : '';
 
     url += `#${path}`;
 
