@@ -1,0 +1,16 @@
+{
+  "name": "Grader App",
+  "build": { "dockerfile": "Dockerfile" },
+  "mounts": ["source=pnpm-store,target=/pnpm-store,type=volume"],
+  "postCreateCommand": "pnpm config set store-dir /pnpm-store",
+  "postStartCommand": "sudo chown -R vscode:vscode /pnpm-store && pnpm install",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "installYarnUsingApt": true,
+      "version": "lts",
+      "pnpmVersion": "latest",
+      "nvmVersion": "latest"
+    }
+  }
+}
