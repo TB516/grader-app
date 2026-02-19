@@ -5,5 +5,8 @@
   onMount(() => {
     const projUrl = searchParams.get('url');
     const projType = searchParams.get('assignment');
+
+    console.log(projUrl);
+    console.log(projType);
   });
 </script>

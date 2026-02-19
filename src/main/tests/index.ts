@@ -21,6 +21,8 @@ const testRouter = (assignment: ProjectTypes, url: string) => {
     case 'Domomaker E':
       return;
   }
+
+  console.log(url);
 };
 
 export default testRouter;
