@@ -3,10 +3,8 @@
 import { ipcRenderer } from 'electron';
 import { ProjectTypes } from '../../resources/projects';
 
-const launchTester = (assignment: ProjectTypes, url: string) =>
-  ipcRenderer.send('launchTestWindow', assignment, url);
+const launchTester = (assignment: ProjectTypes, url: string) => ipcRenderer.send('launchTestWindow', assignment, url);
 
-const testProject = (assignment: ProjectTypes, url: string) =>
-  ipcRenderer.invoke('testProject', assignment, url);
+const testProject = (assignment: ProjectTypes, url: string) => ipcRenderer.invoke('testProject', assignment, url);
 
 export { launchTester, testProject };
