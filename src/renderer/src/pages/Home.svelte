@@ -30,11 +30,50 @@
 </main>
 
 <style>
-  main {
+  header {
+    display: flex;
+    flex-direction: column;
+
+    height: 25vh;
+  }
+
+  header nav {
     display: flex;
 
-    width: 100vw;
-    height: 100vh;
+    height: 60%;
+  }
+
+  nav button {
+    flex: 1;
+
+    border: none;
+
+    font-size: large;
+    font-weight: bold;
+
+    color: white;
+    background-color: maroon;
+  }
+  nav button:disabled {
+    background-color: rgb(103, 1, 1);
+  }
+
+  header h1 {
+    display: flex;
+    flex: 1;
+
+    justify-content: center;
+    align-items: center;
+
+    font-size: x-large;
+    font-weight: bold;
+  }
+
+  main form {
+    display: flex;
+    flex-direction: column;
+
+    height: 75vh;
 
     justify-content: center;
     align-items: center;
