@@ -20,5 +20,10 @@ export default tseslint.config(
       'svelte/no-unused-svelte-ignore': 'off'
     }
   },
+  {
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off'
+    }
+  },
   eslintConfigPrettier
 );
