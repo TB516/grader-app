@@ -3,16 +3,23 @@ import { join } from 'path';
 import { is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 
+type createWindowArgs = {
+  width?: number;
+  height?: number;
+  path: string;
+  query: Record<string, string>;
+};
+
 /**
  * Creates a new app window
  * @param path String value of the hash path
  * @param query Record containing keys and values for the query parameters
  */
-function createWindow(path: string = '/', query: Record<string, string> = {}): void {
+function createWindow({ width = 525, height = 375, path, query }: createWindowArgs): void {
   // Create the browser window.
   const window = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: width,
+    height: height,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),

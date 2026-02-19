@@ -4,17 +4,11 @@ import testRouter from './tests';
 import { ProjectTypes } from '../../resources/projects';
 
 const setupIPC = () => {
-  ipcMain.on(
-    'launchTestWindow',
-    (_e: Electron.IpcMainEvent, assignment: ProjectTypes, url: string) =>
-      createWindow('/results', { assignment, url })
+  ipcMain.on('launchTestWindow', (_e: Electron.IpcMainEvent, assignment: ProjectTypes, url: string) =>
+    createWindow({ path: '/results', query: { assignment, url } })
   );
 
-  ipcMain.handle(
-    'testProject',
-    (_e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes, url: string) =>
-      testRouter(assignment, url)
-  );
+  ipcMain.handle('testProject', (_e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes, url: string) => testRouter(assignment, url));
 };
 
 export default setupIPC;
