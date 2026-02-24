@@ -10,15 +10,15 @@
     "lint": "eslint --cache .",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
-    "typecheck": "pnpm run typecheck:node && pnpm run svelte-check",
+    "typecheck": "bun run typecheck:node && bun run svelte-check",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "pnpm run typecheck && electron-vite build",
+    "build": "bun run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
-    "build:unpack": "pnpm run build && electron-builder --dir",
-    "build:win": "pnpm run build && electron-builder --win",
-    "build:mac": "pnpm run build && electron-builder --mac",
-    "build:linux": "pnpm run build && electron-builder --linux",
+    "build:unpack": "bun run build && electron-builder --dir",
+    "build:win": "bun run build && electron-builder --win",
+    "build:mac": "bun run build && electron-builder --mac",
+    "build:linux": "bun run build && electron-builder --linux",
     "prepare": "husky"
   },
   "dependencies": {
@@ -44,11 +44,5 @@
     "typescript": "^5.8.3",
     "vite": "^7.0.5",
     "vitest": "^3.2.4"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "electron",
-      "esbuild"
-    ]
   }
 }
