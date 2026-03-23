@@ -6,8 +6,8 @@
   "author": "example.com",
   "homepage": "https://electron-vite.org",
   "scripts": {
-    "format": "prettier --plugin prettier-plugin-svelte --write .",
-    "lint": "eslint --cache .",
+    "format": "prettier --write .",
+    "lint": "eslint --cache --fix .",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
     "typecheck": "bun run typecheck:node && bun run svelte-check",
@@ -38,6 +38,7 @@
     "eslint": "^10.1.0",
     "eslint-plugin-svelte": "^3.13.1",
     "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.7.4",
     "prettier-plugin-svelte": "^3.4.0",
     "sv-router": "^0.14.1",
