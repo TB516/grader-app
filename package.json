@@ -11,7 +11,6 @@
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
     "typecheck": "bun run typecheck:node && bun run svelte-check",
-    "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "bun run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
