@@ -4,5 +4,5 @@
  */
 export default {
   '*{.yaml|yml|.json}': 'prettier --write',
-  '*{.ts|.svelte}': ['eslint --fix --cached', 'prettier --write']
+  '*{.ts|.svelte}': ['eslint --fix --cache', 'prettier --write']
 };
