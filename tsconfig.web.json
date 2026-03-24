@@ -8,6 +8,7 @@
     "resources/projects.ts"
   ],
   "compilerOptions": {
+    "composite": true,
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,
     "useDefineForClassFields": true,
