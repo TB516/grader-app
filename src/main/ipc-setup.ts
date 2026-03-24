@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import createWindow from './create-window';
-import testRouter from './graders';
+import projectRouter from './project-router';
 import { ProjectTypes } from '../../resources/projects';
 
 const setupIPC = () => {
@@ -8,7 +8,7 @@ const setupIPC = () => {
     createWindow({ path: '/results', query: { assignment, url } })
   );
 
-  ipcMain.handle('testProject', (_e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes, url: string) => testRouter(assignment, url));
+  ipcMain.handle('testProject', (_e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes, url: string) => projectRouter(assignment, url));
 };
 
 export default setupIPC;
