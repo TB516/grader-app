@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import createWindow from './create-window';
-import testRouter from './tests';
+import testRouter from './graders';
 import { ProjectTypes } from '../../resources/projects';
 
 const setupIPC = () => {
