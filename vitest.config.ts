@@ -8,7 +8,7 @@ export default defineConfig({
       // Main process tests
       {
         test: {
-          include: ['src/main/**/*.test.ts'],
+          include: ['tests/main/**/*.test.ts'],
           environment: 'node'
         }
       },
@@ -21,7 +21,7 @@ export default defineConfig({
             provider: playwright(),
             instances: [{ browser: 'chromium', headless: true }]
           },
-          include: ['src/renderer/**/*svelte.test.ts', 'src/renderer/**/*.test.ts'],
+          include: ['tests/renderer/**/*svelte.test.ts', 'tests/renderer/**/*.test.ts'],
           environment: 'jsdom'
         }
       }
