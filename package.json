@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
-    "@vitest/browser-playwright": "^4.1.0",
+    "@vitest/browser-playwright": "^4.1.1",
     "electron-updater": "^6.3.9",
     "supertest": "^7.2.2"
   },
