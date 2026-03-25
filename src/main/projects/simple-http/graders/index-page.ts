@@ -1,5 +1,5 @@
-import { Grader } from '../../../types';
 import { GraderRunResult } from '../../../../shared/types';
+import { Grader } from '../../../types';
 
 export const indexPageGrader: Grader = {
   label: 'Index Page Returns HTML',

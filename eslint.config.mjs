@@ -1,8 +1,8 @@
-import { defineConfig } from 'eslint/config';
-import tseslint from '@electron-toolkit/eslint-config-ts';
 import eslintConfigPrettier from '@electron-toolkit/eslint-config-prettier';
-import eslintPluginSvelte from 'eslint-plugin-svelte';
+import tseslint from '@electron-toolkit/eslint-config-ts';
+import { defineConfig } from 'eslint/config';
 import { importX } from 'eslint-plugin-import-x';
+import eslintPluginSvelte from 'eslint-plugin-svelte';
 
 export default defineConfig(
   { ignores: ['**/node_modules', '**/dist', '**/out'] },
@@ -21,7 +21,7 @@ export default defineConfig(
   {
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
-      'import-x/order': 'error'
+      'import-x/order': ['error', { alphabetize: { order: 'asc', caseInsensitive: true } }]
     }
   },
   eslintConfigPrettier
