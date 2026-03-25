@@ -1,5 +1,5 @@
-import { shell, BrowserWindow } from 'electron';
 import { join } from 'path';
+import { shell, BrowserWindow } from 'electron';
 import { is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 
