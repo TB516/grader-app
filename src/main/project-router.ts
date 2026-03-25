@@ -3,8 +3,8 @@ import simpleHttp from './projects/simple-http';
 import streamingMedia from './projects/streaming-media';
 import httpApiI from './projects/http-api-I';
 import httpApiII from './projects/http-api-II';
+import simpleModels from './projects/simple-models';
 import domomakerC from './projects/domomaker-c';
-import domomakerE from './projects/domomaker-e';
 
 /**
  * Takes the assignment and invokes the corresponding test suit
@@ -21,10 +21,10 @@ const projectRouter = (assignment: ProjectTypes, url: string) => {
       return httpApiI(url);
     case 'HTTP API II':
       return httpApiII(url);
+    case 'Simple Models':
+      return simpleModels(url);
     case 'Domomaker C':
       return domomakerC(url);
-    case 'Domomaker E':
-      return domomakerE(url);
   }
 };
 
