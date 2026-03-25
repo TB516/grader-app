@@ -1,5 +1,5 @@
-import { GraderRun } from '../../../shared/types';
-import { Grader, StreamRunnerResultFunction, StreamingDoneFunction } from '../../types';
+import type { GraderRun } from '../../../shared/types';
+import type { Grader, StreamRunnerResultFunction, StreamingDoneFunction } from '../../types';
 import { indexPageGrader } from './graders/index-page';
 
 const graders: Grader[] = [indexPageGrader];

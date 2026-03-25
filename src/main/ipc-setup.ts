@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
-import { ProjectTypes, GraderRun } from '../shared/types';
+import type { ProjectTypes, GraderRun } from '../shared/types';
 import createWindow from './create-window';
 import projectRouter from './project-router';
-import { StreamRunnerResultFunction, StreamingDoneFunction } from './types';
+import type { StreamRunnerResultFunction, StreamingDoneFunction } from './types';
 
 const setupIPC = () => {
   ipcMain.on('launchTestWindow', (_e: Electron.IpcMainEvent, assignment: ProjectTypes, url: string) =>

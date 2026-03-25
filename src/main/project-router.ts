@@ -1,6 +1,6 @@
-import { ProjectTypes, GraderRun } from '../shared/types';
+import type { ProjectTypes, GraderRun } from '../shared/types';
 import { simpleHttpRunner } from './projects/simple-http';
-import { StreamingDoneFunction, StreamRunnerResultFunction } from './types';
+import type { StreamingDoneFunction, StreamRunnerResultFunction } from './types';
 
 const projectRouter = (assignment: ProjectTypes, url: string, stream: StreamRunnerResultFunction, done: StreamingDoneFunction): GraderRun[] => {
   switch (assignment) {

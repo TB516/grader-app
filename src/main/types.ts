@@ -1,4 +1,4 @@
-import { GraderRun, GraderRunResult } from '../shared/types';
+import type { GraderRun, GraderRunResult } from '../shared/types';
 
 export type StreamRunnerResultFunction = (run: GraderRun) => void;
 
