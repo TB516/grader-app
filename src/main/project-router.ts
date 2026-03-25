@@ -1,4 +1,4 @@
-import { ProjectTypes } from '../../resources/projects';
+import { ProjectTypes } from '../shared/projects';
 import simpleHttp from './projects/simple-http';
 import streamingMedia from './projects/streaming-media';
 import httpApiI from './projects/http-api-I';

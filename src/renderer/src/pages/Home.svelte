@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { projects, type ProjectTypes } from '../../../../resources/projects';
+  import { projects, type ProjectTypes } from '../../../shared/projects';
 
   let selectedProjectType: ProjectTypes = 'Simple HTTP';
   let projectUrl: string;

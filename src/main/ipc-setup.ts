@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import createWindow from './create-window';
 import projectRouter from './project-router';
-import { ProjectTypes } from '../../resources/projects';
+import { ProjectTypes } from '../shared/projects';
 
 const setupIPC = () => {
   ipcMain.on('launchTestWindow', (_e: Electron.IpcMainEvent, assignment: ProjectTypes, url: string) =>
