@@ -1,30 +1,21 @@
-import { ProjectTypes } from '../shared/projects';
-import simpleHttp from './projects/simple-http';
-import streamingMedia from './projects/streaming-media';
-import httpApiI from './projects/http-api-I';
-import httpApiII from './projects/http-api-II';
-import simpleModels from './projects/simple-models';
-import domomakerC from './projects/domomaker-c';
+import { ProjectTypes, GraderRun } from '../shared/types';
+import { simpleHttpRunner } from './projects/simple-http';
+import { StreamingDoneFunction, StreamRunnerResultFunction } from './types';
 
-/**
- * Takes the assignment and invokes the corresponding test suit
- * @param assignment Assignment to route by
- * @param url Project URL
- */
-const projectRouter = (assignment: ProjectTypes, url: string) => {
+const projectRouter = (assignment: ProjectTypes, url: string, stream: StreamRunnerResultFunction, done: StreamingDoneFunction): GraderRun[] => {
   switch (assignment) {
     case 'Simple HTTP':
-      return simpleHttp(url);
+      return simpleHttpRunner(url, stream, done);
     case 'Streaming Media':
-      return streamingMedia(url);
+      return simpleHttpRunner(url, stream, done);
     case 'HTTP API I':
-      return httpApiI(url);
+      return simpleHttpRunner(url, stream, done);
     case 'HTTP API II':
-      return httpApiII(url);
+      return simpleHttpRunner(url, stream, done);
     case 'Simple Models':
-      return simpleModels(url);
+      return simpleHttpRunner(url, stream, done);
     case 'Domomaker C':
-      return domomakerC(url);
+      return simpleHttpRunner(url, stream, done);
   }
 };
 
