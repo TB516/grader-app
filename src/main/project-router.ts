@@ -19,4 +19,4 @@ const projectRouter = (assignment: ProjectTypes, url: string, stream: StreamRunn
   }
 };
 
-export default projectRouter;
+export { projectRouter };

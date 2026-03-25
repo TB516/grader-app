@@ -56,4 +56,4 @@ function createWindow({ width = 900, height = 670, path, query }: createWindowAr
   }
 }
 
-export default createWindow;
+export { createWindow };

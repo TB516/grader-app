@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import type { ProjectTypes, GraderRun } from '../shared/types';
-import createWindow from './create-window';
-import projectRouter from './project-router';
+import { createWindow } from './create-window';
+import { projectRouter } from './project-router';
 import type { StreamRunnerResultFunction, StreamingDoneFunction } from './types';
 
 const setupIPC = () => {
@@ -22,4 +22,4 @@ const setupIPC = () => {
   });
 };
 
-export default setupIPC;
+export { setupIPC };
