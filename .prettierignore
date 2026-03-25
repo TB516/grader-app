@@ -2,5 +2,3 @@ out
 dist
 bun.lock
 LICENSE.md
-tsconfig.json
-tsconfig.*.json
