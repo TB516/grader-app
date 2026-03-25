@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
-    "@vitest/browser-playwright": "^4.1.1",
     "electron-updater": "^6.3.9"
   },
   "devDependencies": {
@@ -32,6 +31,7 @@
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/node": "^25.5.0",
+    "@vitest/browser-playwright": "^4.1.1",
     "electron": "^41.0.3",
     "electron-builder": "^26.0.12",
     "electron-vite": "^5.0.0",
