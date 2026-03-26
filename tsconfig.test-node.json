@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig.node.json",
-  "include": ["tests/main/**/*", "src/main/**/*", "src/preload/**/*", "src/shared/**/*"],
+  "include": ["tests/main/**/*", "src/main/**/*", "src/preload/**/*", "src/shared/**/*"]
 }
