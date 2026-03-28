@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { indexPageGrader } from '../../../../../src/main/projects/simple-http/graders/index-page';
 import type { GraderRunResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
-import { badIndexPageUrl, httpErrorIndexPageUrl, goodIndexPageUrl, networkErrorIndexPageUrl } from '../mocks/index-page-handler';
+import { badIndexPageUrl, httpErrorIndexPageUrl, goodIndexPageUrl, networkErrorIndexPageUrl } from '../mocks/index-page-handlers';
 
 describe('Index page tests', () => {
   beforeAll(() => server.listen());
