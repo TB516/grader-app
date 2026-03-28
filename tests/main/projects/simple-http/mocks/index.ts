@@ -1,4 +1,4 @@
 import { setupServer } from 'msw/node';
-import { indexPageHandler } from './index-page-handler';
+import { goodIndexPageHandler, badIndexPageHandler, httpErrorIndexPageHandler, networkErrorIndexPageHandler } from './index-page-handler';
 
-export const server = setupServer(...[indexPageHandler]);
+export const server = setupServer(...[goodIndexPageHandler, badIndexPageHandler, httpErrorIndexPageHandler, networkErrorIndexPageHandler]);
