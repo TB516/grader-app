@@ -8,7 +8,7 @@ export const indexPageGrader: Grader = {
 
     if (response.status !== 200) {
       return {
-        status: 'error',
+        status: 'fail',
         message: 'HTTP response status was not 200',
         details: JSON.stringify(response)
       };
@@ -16,7 +16,7 @@ export const indexPageGrader: Grader = {
 
     if (response.headers.get('Content-Type') !== 'text/html') {
       return {
-        status: 'error',
+        status: 'fail',
         message: 'Content-Type header was not "text/html"',
         details: JSON.stringify(response)
       };
