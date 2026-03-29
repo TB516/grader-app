@@ -2,37 +2,37 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { genericHtmlRunner } from '../../../../../src/main/projects/simple-http/graders/generic-html-runner';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
-import { badIndexPageUrl, goodIndexPageUrl, httpErrorIndexPageUrl, networkErrorIndexPageUrl } from '../mocks/index-page-handlers';
+import { badPage2Url, goodPage2Url, httpErrorPage2Url, networkErrorPage2Url } from '../mocks/page-2-handlers';
 
-describe('Index page tests', () => {
+describe('Page 2 tests', () => {
   beforeAll(() => server.listen());
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
   test('Grader passes good assignment', async () => {
     const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-    const result = await genericHtmlRunner(goodIndexPageUrl);
+    const result = await genericHtmlRunner(goodPage2Url);
 
     expect(result).toMatchObject(expected);
   });
 
   test('Grader fails bad assignment', async () => {
     const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-    const result = await genericHtmlRunner(badIndexPageUrl);
+    const result = await genericHtmlRunner(badPage2Url);
 
     expect(result).toMatchObject(expected);
   });
 
   test('Grader errors a non 200 response', async () => {
     const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-    const result = await genericHtmlRunner(httpErrorIndexPageUrl);
+    const result = await genericHtmlRunner(httpErrorPage2Url);
 
     expect(result).toMatchObject(expected);
   });
 
   test('Grader errors on network error', async () => {
     const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-    const result = await genericHtmlRunner(networkErrorIndexPageUrl);
+    const result = await genericHtmlRunner(networkErrorPage2Url);
 
     expect(result).toMatchObject(expected);
   });
