@@ -4,10 +4,10 @@ export type ProjectTypes = (typeof projects)[number];
 
 export type GraderRun = {
   label: string;
-  result: GraderRunResult | null;
+  result: GraderResult | null;
 };
 
-export type GraderRunResult = {
+export type GraderResult = {
   status: 'pass' | 'fail' | 'error';
   message: string;
   details?: string;

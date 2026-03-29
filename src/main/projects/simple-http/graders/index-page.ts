@@ -1,9 +1,9 @@
-import type { GraderRunResult } from '../../../../shared/types';
+import type { GraderResult } from '../../../../shared/types';
 import type { Grader } from '../../../types';
 
 export const indexPageGrader: Grader = {
   label: 'Index Page Returns HTML',
-  run: async (url: string): Promise<GraderRunResult> => {
+  run: async (url: string): Promise<GraderResult> => {
     try {
       const response = await fetch(url);
 

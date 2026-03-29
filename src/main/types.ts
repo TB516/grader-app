@@ -1,4 +1,4 @@
-import type { GraderRun, GraderRunResult } from '../shared/types';
+import type { GraderRun, GraderResult } from '../shared/types';
 
 export type StreamRunnerResultFunction = (run: GraderRun) => void;
 
@@ -6,5 +6,5 @@ export type StreamingDoneFunction = VoidFunction;
 
 export type Grader = {
   label: string;
-  run: (url: string) => Promise<GraderRunResult>;
+  run: (url: string) => Promise<GraderResult>;
 };
