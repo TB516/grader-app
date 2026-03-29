@@ -1,7 +1,7 @@
 import type { Grader } from '../../../types';
 import { genericHtmlRunner } from './generic-html-runner';
 
-export const indexPageGrader: Grader = {
-  label: 'Index Page Returns HTML',
+export const page2Grader: Grader = {
+  label: 'Page 2 returns HTML',
   run: genericHtmlRunner
 };
