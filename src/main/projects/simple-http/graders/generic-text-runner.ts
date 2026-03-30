@@ -11,7 +11,7 @@ export const genericTextRunner = async (url: string, compare: string): Promise<G
   let failure = httpStatusCheck(response.value, 200);
   if (failure) return failure;
 
-  failure = contentTypeCheck(response.value, 'text/html');
+  failure = contentTypeCheck(response.value, 'text/plain');
   if (failure) return failure;
 
   const text = await t(response.value.text);
