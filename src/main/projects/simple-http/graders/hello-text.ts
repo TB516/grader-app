@@ -4,7 +4,7 @@ import { contentTypeCheck } from '../../utils/content-type-check';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 
-const expectedText = 'Hello World';
+const EXPECTED_TEXT = 'Hello World';
 
 export const helloTextGrader: Grader = {
   label: 'Hello Endpoint Returns "Hello World"',
@@ -21,11 +21,11 @@ export const helloTextGrader: Grader = {
     const text = await t(async () => await response.value.text());
     if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: JSON.stringify(text.error) };
 
-    if (text.value === expectedText) return { status: 'fail', message: `Text was not '${expectedText}'`, details: JSON.stringify(response) };
+    if (text.value === EXPECTED_TEXT) return { status: 'fail', message: `Text was not '${EXPECTED_TEXT}'`, details: JSON.stringify(response) };
 
     return {
       status: 'pass',
-      message: `Text was '${expectedText}'`,
+      message: `Text was '${EXPECTED_TEXT}'`,
       details: JSON.stringify(response)
     };
   }
