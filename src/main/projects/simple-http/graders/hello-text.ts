@@ -18,7 +18,7 @@ export const helloTextGrader: Grader = {
     failure = contentTypeCheck(response.value, 'text/plain');
     if (failure) return failure;
 
-    const text = await t(response.value.text);
+    const text = await t(async () => await response.value.text());
     if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: JSON.stringify(text.error) };
 
     if (text.value === expectedText) return { status: 'fail', message: `Text was not '${expectedText}'`, details: JSON.stringify(response) };
