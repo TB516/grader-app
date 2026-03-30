@@ -1,8 +1,19 @@
 import type { ProjectTypes, GraderRun } from '../shared/types';
 import { simpleHttpRunner } from './projects/simple-http';
-import type { StreamingDoneFunction, StreamRunnerResultFunction } from './types';
 
-const projectRouter = (assignment: ProjectTypes, url: string, stream: StreamRunnerResultFunction, done: StreamingDoneFunction): GraderRun[] => {
+type StreamRunnerResultFunction = (run: GraderRun) => void;
+
+type StreamingDoneFunction = VoidFunction;
+
+const projectRouter = (e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes, url: string): GraderRun[] => {
+  const stream: StreamRunnerResultFunction = (run: GraderRun) => {
+    e.sender.send('grader:run', run);
+  };
+
+  const done: StreamingDoneFunction = () => {
+    e.sender.send('grader:done');
+  };
+
   switch (assignment) {
     case 'Simple HTTP':
       return simpleHttpRunner(url, stream, done);

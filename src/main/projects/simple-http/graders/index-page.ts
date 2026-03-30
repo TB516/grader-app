@@ -1,4 +1,4 @@
-import type { Grader } from '../../../types';
+import type { Grader } from '../../grader';
 import { genericHtmlRunner } from './generic-html-runner';
 
 export const indexPageGrader: Grader = {
