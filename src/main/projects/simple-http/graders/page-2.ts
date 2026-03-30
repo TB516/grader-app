@@ -16,7 +16,7 @@ export const page2Grader: Grader = {
     failure = contentTypeCheck(response.value, 'text/html');
     if (failure) return failure;
 
-    const text = await t(response.value.text);
+    const text = await t(async () => await response.value.text());
     if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: JSON.stringify(text.error) };
 
     return { status: 'pass', message: 'Page 2 Returned HTML', details: JSON.stringify(response.value) };
