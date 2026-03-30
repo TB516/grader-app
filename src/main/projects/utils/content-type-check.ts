@@ -1,7 +1,7 @@
 import type { GraderResult } from '../../../shared/types';
 
 export const contentTypeCheck = (response: Response, contentType: string): GraderResult | null => {
-  if (response.headers.get('Content-Type')?.includes(contentType)) {
+  if (!response.headers.get('Content-Type')?.includes(contentType)) {
     return {
       status: 'fail',
       message: `Content-Type header was not "${contentType}"`,
