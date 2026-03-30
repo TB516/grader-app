@@ -1,9 +1,6 @@
 import type { ProjectTypes, GraderRun } from '../shared/types';
 import { simpleHttpRunner } from './projects/simple-http';
-
-type StreamRunnerResultFunction = (run: GraderRun) => void;
-
-type StreamingDoneFunction = VoidFunction;
+import type { StreamingDoneFunction, StreamRunnerResultFunction } from './types';
 
 const projectRouter = (e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes, url: string): GraderRun[] => {
   const stream: StreamRunnerResultFunction = (run: GraderRun) => {

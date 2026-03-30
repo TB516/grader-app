@@ -1,4 +1,4 @@
-import type { Grader } from '../../grader';
+import type { Grader } from '../../../types';
 import { genericTextRunner } from './generic-text-runner';
 
 export const helloTextGrader: Grader = {
