@@ -2,7 +2,7 @@ import { HttpResponse } from 'msw';
 import { WIGGLE_ROOM } from '../../../../../src/main/projects/simple-http/graders/time-text';
 
 const getTime = (d: Date) => {
-  return `${d.getHours()}${d.getMinutes()}${d.getSeconds()}`;
+  return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
 };
 
 export const goodTimeResolver = () => {
@@ -13,7 +13,7 @@ export const httpErrorTimeResolver = () => {
   return new HttpResponse({ status: 400 });
 };
 
-export const parseFailureTimeResolver = () => {
+export const timeParseFailureTimeResolver = () => {
   return HttpResponse.text(``);
 };
 
