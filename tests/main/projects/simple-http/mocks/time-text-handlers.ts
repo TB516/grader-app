@@ -5,7 +5,7 @@ import {
   goodTimeResolver,
   httpErrorTimeResolver,
   networkErrorTimeResolver,
-  parseFailureTimeResolver
+  timeParseFailureTimeResolver
 } from './time-resolvers';
 
 export const goodTimeTextUrl = 'https://good.simple-http.com/time';
@@ -14,8 +14,8 @@ export const goodTimeTextHandler = http.get(goodTimeTextUrl, goodTimeResolver);
 export const httpErrorTimeTextUrl = 'https://httperror.simple-http.com/time';
 export const httpErrorTimeTexHandler = http.get(httpErrorTimeTextUrl, httpErrorTimeResolver);
 
-export const parseFailureTimeTextUrl = 'https://parseFailure.simple-http.com/time';
-export const parseFailureTimeTextHandler = http.get(parseFailureTimeTextUrl, parseFailureTimeResolver);
+export const timeParseFailureTimeTextUrl = 'https://timeParseFailure.simple-http.com/time';
+export const timeParseFailureTimeTextHandler = http.get(timeParseFailureTimeTextUrl, timeParseFailureTimeResolver);
 
 export const badContentTypeTimeTextUrl = 'https://badContentType.simple-http.com/time';
 export const badContentTypeTimeTexHandler = http.get(badContentTypeTimeTextUrl, badContentTypeTimeResolver);

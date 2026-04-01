@@ -8,7 +8,7 @@ import {
   httpErrorTimeTexHandler,
   networkErrorTimeTextHandler,
   parseFailureTimeTextHandler
-} from './time-text';
+} from './time-text-handlers';
 
 export const server = setupServer(
   ...[
