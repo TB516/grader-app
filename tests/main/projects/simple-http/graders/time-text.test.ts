@@ -44,7 +44,7 @@ describe('Time text endpoint tests', () => {
     expect(result).toMatchObject(expected);
   });
 
-  test('Grader fails if the time url does not parse', async () => {
+  test('Grader fails if the time string does not parse', async () => {
     const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
     const result = await timeTextGrader.run(timeParseFailureTimeTextUrl);
 
