@@ -4,7 +4,7 @@ import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
-import { parseTimeString } from '../../utils/parseTimeString';
+import { parseTimeString } from '../../utils/parse-time-string';
 
 const WIGGLE_ROOM = 60;
 
