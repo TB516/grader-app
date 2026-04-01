@@ -1,3 +1,4 @@
+import { Temporal } from 'temporal-polyfill';
 import { t } from 'try';
 
 export const parseTimeString = (input: string): Temporal.PlainTime | null => {
