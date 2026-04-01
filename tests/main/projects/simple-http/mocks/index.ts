@@ -1,6 +1,14 @@
 import { setupServer } from 'msw/node';
 import { badIndexPageHandler, goodIndexPageHandler, httpErrorIndexPageHandler, networkErrorIndexPageHandler } from './index-page-handlers';
 import { badPage2Handler, goodPage2Handler, httpErrorPage2Handler, networkErrorPage2Handler } from './page-2-handlers';
+import {
+  badContentTypeTimeTexHandler,
+  badTimeTextHandler,
+  goodTimeTextHandler,
+  httpErrorTimeTexHandler,
+  networkErrorTimeTextHandler,
+  parseFailureTimeTextHandler
+} from './time-text';
 
 export const server = setupServer(
   ...[
@@ -11,6 +19,12 @@ export const server = setupServer(
     goodPage2Handler,
     badPage2Handler,
     httpErrorPage2Handler,
-    networkErrorPage2Handler
+    networkErrorPage2Handler,
+    goodTimeTextHandler,
+    httpErrorTimeTexHandler,
+    parseFailureTimeTextHandler,
+    badContentTypeTimeTexHandler,
+    badTimeTextHandler,
+    networkErrorTimeTextHandler
   ]
 );
