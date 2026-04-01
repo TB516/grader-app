@@ -2,7 +2,7 @@ import { HttpResponse } from 'msw';
 import { WIGGLE_ROOM } from '../../../../../src/main/projects/simple-http/graders/time-text';
 
 const getTime = (d: Date) => {
-  return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+  return `${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}`;
 };
 
 export const goodTimeResolver = () => {
