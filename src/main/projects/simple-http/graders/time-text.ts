@@ -30,7 +30,7 @@ export const timeTextGrader: Grader = {
     const diff = Math.abs(responseTime.until(expectedTime).total({ unit: 'seconds' }));
     const wrappedDif = Math.min(diff, 86400 - diff);
 
-    if (wrappedDif <= WIGGLE_ROOM)
+    if (wrappedDif >= WIGGLE_ROOM)
       return {
         status: 'fail',
         message: `Text was '${text.value}', which is not '${expectedTime.toString()}' +/- ${WIGGLE_ROOM}s`,
