@@ -6,7 +6,7 @@ import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { parseTimeString } from '../../utils/parse-time-string';
 
-const WIGGLE_ROOM = 60;
+export const WIGGLE_ROOM = 60;
 
 export const helloTextGrader: Grader = {
   label: 'Time Endpoint Returns Correct Time',
