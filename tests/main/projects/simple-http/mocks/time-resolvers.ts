@@ -10,7 +10,7 @@ export const goodTimeResolver = () => {
 };
 
 export const httpErrorTimeResolver = () => {
-  return new HttpResponse({ status: 400 });
+  return new HttpResponse(null, { status: 400 });
 };
 
 export const timeParseFailureTimeResolver = () => {
