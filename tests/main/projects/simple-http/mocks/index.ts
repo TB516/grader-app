@@ -7,7 +7,7 @@ import {
   goodTimeTextHandler,
   httpErrorTimeTexHandler,
   networkErrorTimeTextHandler,
-  parseFailureTimeTextHandler
+  timeParseFailureTimeTextHandler
 } from './time-text-handlers';
 
 export const server = setupServer(
@@ -22,7 +22,7 @@ export const server = setupServer(
     networkErrorPage2Handler,
     goodTimeTextHandler,
     httpErrorTimeTexHandler,
-    parseFailureTimeTextHandler,
+    timeParseFailureTimeTextHandler,
     badContentTypeTimeTexHandler,
     badTimeTextHandler,
     networkErrorTimeTextHandler
