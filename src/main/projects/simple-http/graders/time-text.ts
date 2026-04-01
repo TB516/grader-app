@@ -25,7 +25,7 @@ export const timeTextGrader: Grader = {
     if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: JSON.stringify(text.error) };
 
     const responseTime = parseTimeString(text.value);
-    if (!responseTime) return { status: 'error', message: `Failed to parse time '${text.value}'`, details: JSON.stringify(response.value) };
+    if (!responseTime) return { status: 'fail', message: `Failed to parse time '${text.value}'`, details: JSON.stringify(response.value) };
 
     const diff = Math.abs(responseTime.until(expectedTime).total({ unit: 'seconds' }));
     const wrappedDif = Math.min(diff, 86400 - diff);
