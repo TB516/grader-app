@@ -29,8 +29,8 @@ test('Grader fails bad assignment', async () => {
   expect(result).toMatchObject(expected);
 });
 
-test('Grader errors a non 200 response', async () => {
-  const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
+test('Grader fails a non 200 response', async () => {
+  const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
   const result = await timeTextGrader.run(httpErrorTimeTextUrl);
 
   expect(result).toMatchObject(expected);
