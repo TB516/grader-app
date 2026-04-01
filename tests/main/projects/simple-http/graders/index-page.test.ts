@@ -23,8 +23,8 @@ describe('Index page tests', () => {
     expect(result).toMatchObject(expected);
   });
 
-  test('Grader errors a non 200 response', async () => {
-    const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
+  test('Grader fails a non 200 response', async () => {
+    const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
     const result = await indexPageGrader.run(httpErrorIndexPageUrl);
 
     expect(result).toMatchObject(expected);
