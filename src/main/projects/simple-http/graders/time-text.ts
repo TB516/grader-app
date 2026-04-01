@@ -8,7 +8,7 @@ import { parseTimeString } from '../../utils/parse-time-string';
 
 export const WIGGLE_ROOM = 60;
 
-export const helloTextGrader: Grader = {
+export const timeTextGrader: Grader = {
   label: 'Time Endpoint Returns Correct Time',
   run: async (url) => {
     const expectedTime = Temporal.Now.plainTimeISO('UTC');
