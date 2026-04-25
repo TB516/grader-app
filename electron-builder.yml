@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: grader-app
+appId: io.github.tb516.grader-app
+productName: io.github.tb516.grader-app
 directories:
   buildResources: build
 files:

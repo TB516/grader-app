@@ -1,5 +1,5 @@
 {
-  "name": "grader-app",
+  "name": "io.github.tb516.grader-app",
   "version": "1.0.0",
   "description": "An Electron application with Svelte and TypeScript",
   "main": "./out/main/index.js",
