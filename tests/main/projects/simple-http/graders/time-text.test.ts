@@ -3,12 +3,12 @@ import { timeTextGrader } from '../../../../../src/main/projects/simple-http/gra
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
 import {
-  badContentTypeTimeTextUrl,
-  badTimeTextUrl,
-  goodTimeTextUrl,
-  httpErrorTimeTextUrl,
-  networkErrorTimeTextUrl,
-  timeParseFailureTimeTextUrl
+  badContentTypeTimeTextBaseUrl,
+  badTimeTextBaseUrl,
+  goodTimeTextBaseUrl,
+  httpErrorTimeTextBaseUrl,
+  networkErrorTimeTextBaseUrl,
+  timeParseFailureTimeTextBaseUrl
 } from '../mocks/time-text-handlers';
 
 beforeAll(() => server.listen());
@@ -17,42 +17,42 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(goodTimeTextUrl);
+  const result = await timeTextGrader.run(goodTimeTextBaseUrl);
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(badTimeTextUrl);
+  const result = await timeTextGrader.run(badTimeTextBaseUrl);
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(httpErrorTimeTextUrl);
+  const result = await timeTextGrader.run(httpErrorTimeTextBaseUrl);
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(networkErrorTimeTextUrl);
+  const result = await timeTextGrader.run(networkErrorTimeTextBaseUrl);
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the time string does not parse', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(timeParseFailureTimeTextUrl);
+  const result = await timeTextGrader.run(timeParseFailureTimeTextBaseUrl);
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'text/plain'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(badContentTypeTimeTextUrl);
+  const result = await timeTextGrader.run(badContentTypeTimeTextBaseUrl);
 
   expect(result).toMatchObject(expected);
 });

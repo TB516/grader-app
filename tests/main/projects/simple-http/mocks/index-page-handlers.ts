@@ -16,4 +16,4 @@ export const httpErrorIndexPageUrl = 'https://httperror.simple-http.com';
 export const httpErrorIndexPageHandler = http.get(httpErrorIndexPageUrl, httpErrorGenericHtmlResolver);
 
 export const networkErrorIndexPageUrl = 'https://neterror.simple-http.com';
-export const networkErrorIndexPageHandler = http.get(httpErrorIndexPageUrl, networkErrorGenericHtmlResolver);
+export const networkErrorIndexPageHandler = http.get(networkErrorIndexPageUrl, networkErrorGenericHtmlResolver);

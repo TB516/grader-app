@@ -12,7 +12,7 @@ export const timeTextGrader: Grader = {
   label: 'Time Endpoint Returns Correct Time',
   run: async (url) => {
     const expectedTime = Temporal.Now.plainTimeISO('UTC');
-    const response = await t(fetch, url);
+    const response = await t(fetch, `${url}/time`);
     if (!response.ok) return fetchErrorResult(response.error);
 
     let failure = httpStatusCheck(response.value, 200);
@@ -34,13 +34,13 @@ export const timeTextGrader: Grader = {
       return {
         status: 'fail',
         message: `Text was '${text.value}', which is not '${expectedTime.toString()}' +/- ${WIGGLE_ROOM}s`,
-        details: JSON.stringify(response)
+        details: JSON.stringify(response.value)
       };
 
     return {
       status: 'pass',
-      message: `Text was '${text.value}', which is '${expectedTime.toString()}' +/- ${WIGGLE_ROOM}`,
-      details: JSON.stringify(response)
+      message: `Text was '${text.value}', which is '${expectedTime.toString()}' +/- ${WIGGLE_ROOM}s`,
+      details: JSON.stringify(response.value)
     };
   }
 };

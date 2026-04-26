@@ -1,7 +1,7 @@
 import { HttpResponse } from 'msw';
 
 export const goodGenericHtmlResolver = () => {
-  return HttpResponse.html();
+  return HttpResponse.html('<html><body><h1>Header</h1></body></html>');
 };
 
 export const badGenericHtmlResolver = () => {

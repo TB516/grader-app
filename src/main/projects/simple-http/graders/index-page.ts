@@ -18,6 +18,7 @@ export const indexPageGrader: Grader = {
 
     const text = await t(async () => await response.value.text());
     if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: JSON.stringify(text.error) };
+    if (!text.value.trim()) return { status: 'fail', message: 'HTML body was empty', details: JSON.stringify(response.value) };
 
     return { status: 'pass', message: 'Index Page Returned HTML', details: JSON.stringify(response.value) };
   }

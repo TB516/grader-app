@@ -9,7 +9,7 @@ const EXPECTED_TEXT = 'Hello World';
 export const helloTextGrader: Grader = {
   label: 'Hello Endpoint Returns "Hello World"',
   run: async (url) => {
-    const response = await t(fetch, url);
+    const response = await t(fetch, `${url}/hello`);
     if (!response.ok) return fetchErrorResult(response.error);
 
     let failure = httpStatusCheck(response.value, 200);
@@ -21,12 +21,12 @@ export const helloTextGrader: Grader = {
     const text = await t(async () => await response.value.text());
     if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: JSON.stringify(text.error) };
 
-    if (text.value === EXPECTED_TEXT) return { status: 'fail', message: `Text was not '${EXPECTED_TEXT}'`, details: JSON.stringify(response) };
+    if (text.value !== EXPECTED_TEXT) return { status: 'fail', message: `Text was not '${EXPECTED_TEXT}'`, details: JSON.stringify(response.value) };
 
     return {
       status: 'pass',
       message: `Text was '${EXPECTED_TEXT}'`,
-      details: JSON.stringify(response)
+      details: JSON.stringify(response.value)
     };
   }
 };

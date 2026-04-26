@@ -5,34 +5,34 @@ const getTime = (d: Date) => {
   return `${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}`;
 };
 
-export const goodTimeTextUrl = 'https://good.simple-http.com/time';
-export const goodTimeTextHandler = http.get(goodTimeTextUrl, () => {
+export const goodTimeTextBaseUrl = 'https://good.simple-http.com';
+export const goodTimeTextHandler = http.get(`${goodTimeTextBaseUrl}/time`, () => {
   return HttpResponse.text(getTime(new Date()));
 });
 
-export const httpErrorTimeTextUrl = 'https://httperror.simple-http.com/time';
-export const httpErrorTimeTexHandler = http.get(httpErrorTimeTextUrl, () => {
+export const httpErrorTimeTextBaseUrl = 'https://httperror.simple-http.com';
+export const httpErrorTimeTexHandler = http.get(`${httpErrorTimeTextBaseUrl}/time`, () => {
   return new HttpResponse(null, { status: 400 });
 });
 
-export const timeParseFailureTimeTextUrl = 'https://timeParseFailure.simple-http.com/time';
-export const timeParseFailureTimeTextHandler = http.get(timeParseFailureTimeTextUrl, () => {
+export const timeParseFailureTimeTextBaseUrl = 'https://parsefailure.simple-http.com';
+export const timeParseFailureTimeTextHandler = http.get(`${timeParseFailureTimeTextBaseUrl}/time`, () => {
   return HttpResponse.text(``);
 });
 
-export const badContentTypeTimeTextUrl = 'https://badContentType.simple-http.com/time';
-export const badContentTypeTimeTexHandler = http.get(badContentTypeTimeTextUrl, () => {
+export const badContentTypeTimeTextBaseUrl = 'https://badContentType.simple-http.com';
+export const badContentTypeTimeTexHandler = http.get(`${badContentTypeTimeTextBaseUrl}/time`, () => {
   return HttpResponse.html();
 });
 
-export const badTimeTextUrl = 'https://bad.simple-http.com/time';
-export const badTimeTextHandler = http.get(badTimeTextUrl, () => {
+export const badTimeTextBaseUrl = 'https://bad.simple-http.com';
+export const badTimeTextHandler = http.get(`${badTimeTextBaseUrl}/time`, () => {
   const date = new Date();
   date.setSeconds(date.getSeconds() + WIGGLE_ROOM * 2);
   return HttpResponse.text(getTime(date));
 });
 
-export const networkErrorTimeTextUrl = 'https://neterror.simple-http.com';
-export const networkErrorTimeTextHandler = http.get(networkErrorTimeTextUrl, () => {
+export const networkErrorTimeTextBaseUrl = 'https://neterror.simple-http.com';
+export const networkErrorTimeTextHandler = http.get(`${networkErrorTimeTextBaseUrl}/time`, () => {
   return HttpResponse.error();
 });
