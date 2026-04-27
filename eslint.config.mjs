@@ -16,6 +16,9 @@ export default defineConfig(
       parserOptions: {
         parser: tseslint.parser
       }
+    },
+    rules: {
+      'import-x/no-duplicates': ['off']
     }
   },
   {
