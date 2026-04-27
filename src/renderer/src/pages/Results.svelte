@@ -1,8 +1,9 @@
 <script lang="ts">
   import { searchParams } from 'sv-router';
   import { onMount } from 'svelte';
-  import Spinner from '../components/Spinner.svelte';
   import type { GraderRun, ProjectTypes } from '../../../shared/types';
+  import GraderResultRow from '../components/GraderResultRow.svelte';
+  import ResultsSummary from '../components/ResultsSummary.svelte';
 
   type PageStatus = 'starting' | 'running' | 'done' | 'error';
 
@@ -12,7 +13,6 @@
   let projectType: ProjectTypes;
   let graders: GraderRun[] = [];
 
-  const statusLabel = (run: GraderRun): string => run.result?.status ?? 'pending';
   const completedCount = (): number => graders.filter((run) => run.result !== null).length;
   const statusCount = (status: 'pass' | 'fail' | 'error'): number => graders.filter((run) => run.result?.status === status).length;
   const pendingCount = (): number => graders.filter((run) => run.result === null).length;
@@ -99,32 +99,14 @@
       <p>{errorMessage}</p>
     </section>
   {:else}
-    <section class="summary" aria-label="Grading summary">
-      <div>
-        <span>Total</span>
-        <strong>{graders.length}</strong>
-      </div>
-      <div>
-        <span>Complete</span>
-        <strong>{completedCount()}</strong>
-      </div>
-      <div>
-        <span>Passed</span>
-        <strong>{statusCount('pass')}</strong>
-      </div>
-      <div>
-        <span>Failed</span>
-        <strong>{statusCount('fail')}</strong>
-      </div>
-      <div>
-        <span>Errors</span>
-        <strong>{statusCount('error')}</strong>
-      </div>
-      <div>
-        <span>Pending</span>
-        <strong>{pendingCount()}</strong>
-      </div>
-    </section>
+    <ResultsSummary
+      total={graders.length}
+      complete={completedCount()}
+      passed={statusCount('pass')}
+      failed={statusCount('fail')}
+      errors={statusCount('error')}
+      pending={pendingCount()}
+    />
 
     {#if graders.length === 0}
       <section class="notice">
@@ -134,33 +116,7 @@
     {:else}
       <ol class="graders" aria-label="Graders">
         {#each graders as grader (grader.label)}
-          <li
-            class:pending={grader.result === null}
-            class:pass={grader.result?.status === 'pass'}
-            class:fail={grader.result?.status === 'fail'}
-            class:error={grader.result?.status === 'error'}
-          >
-            <div class="grader-heading">
-              <h2>{grader.label}</h2>
-              <span>{statusLabel(grader)}</span>
-            </div>
-
-            {#if grader.result}
-              <p>{grader.result.message}</p>
-
-              {#if grader.result.details && grader.result.status !== 'pass'}
-                <details>
-                  <summary>Details</summary>
-                  <pre>{grader.result.details}</pre>
-                </details>
-              {/if}
-            {:else}
-              <p class="pending-message">
-                <Spinner ariaLabel="Waiting for grader result" />
-                Waiting for result
-              </p>
-            {/if}
-          </li>
+          <GraderResultRow {grader} />
         {/each}
       </ol>
     {/if}
@@ -239,40 +195,6 @@
     background: #ef4444;
   }
 
-  .summary {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 10px;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    margin-bottom: 18px;
-    padding: 12px 0;
-    background: rgb(8 9 11 / 92%);
-    backdrop-filter: blur(12px);
-  }
-
-  .summary div {
-    padding: 12px 0;
-  }
-
-  .summary span {
-    display: block;
-    color: #717a75;
-    font-size: 0.76rem;
-    font-weight: 650;
-    text-transform: uppercase;
-  }
-
-  .summary strong {
-    display: block;
-    margin-top: 6px;
-    color: #f3f4ef;
-    font-size: 2rem;
-    font-weight: 680;
-    line-height: 1;
-  }
-
   .notice {
     margin-top: 24px;
     padding: 18px;
@@ -295,120 +217,6 @@
     list-style: none;
   }
 
-  .graders li {
-    display: grid;
-    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
-    gap: 22px;
-    padding: 20px 0;
-    border-bottom: 1px solid #1b2023;
-  }
-
-  .graders li.pass {
-    border-left: 3px solid #22c55e;
-    padding-left: 16px;
-  }
-
-  .graders li.fail {
-    border-left: 3px solid #ef4444;
-    padding-left: 16px;
-  }
-
-  .graders li.error {
-    border-left: 3px solid #facc15;
-    padding-left: 16px;
-  }
-
-  .graders li.pending {
-    border-left: 3px solid #6b7280;
-    padding-left: 16px;
-  }
-
-  .grader-heading {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  h2 {
-    margin: 0;
-    color: #f3f4ef;
-    font-size: 1.05rem;
-    font-weight: 680;
-    line-height: 1.35;
-  }
-
-  .grader-heading span {
-    flex: 0 0 auto;
-    min-width: 76px;
-    padding: 5px 10px;
-    border-radius: 999px;
-    color: #aeb8b1;
-    background: #111417;
-    text-align: center;
-    text-transform: capitalize;
-    font-size: 0.78rem;
-    font-weight: 700;
-  }
-
-  .pass .grader-heading span {
-    color: #06130a;
-    background: #22c55e;
-  }
-
-  .fail .grader-heading span {
-    color: #fff1f2;
-    background: #991b1b;
-  }
-
-  .error .grader-heading span {
-    color: #1c1400;
-    background: #facc15;
-  }
-
-  .pending .grader-heading span {
-    color: #e5e7eb;
-    background: #374151;
-  }
-
-  .graders p {
-    margin: 0;
-    color: #aeb8b1;
-    line-height: 1.5;
-  }
-
-  .pending-message {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  details {
-    margin-top: 12px;
-  }
-
-  summary {
-    width: fit-content;
-    color: #dce3dd;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  summary::marker {
-    color: #7f8782;
-  }
-
-  pre {
-    overflow-x: auto;
-    margin: 12px 0 0;
-    border-left: 1px solid #323a36;
-    padding: 4px 0 4px 14px;
-    color: #dce3dd;
-    white-space: pre-wrap;
-    line-height: 1.45;
-  }
-
   @media (max-width: 760px) {
     :global(body) {
       min-width: 0;
@@ -422,20 +230,6 @@
     .topbar {
       flex-direction: column;
       align-items: flex-start;
-    }
-
-    .summary {
-      position: static;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .summary div {
-      padding-bottom: 8px;
-    }
-
-    .graders li {
-      grid-template-columns: 1fr;
-      gap: 12px;
     }
   }
 </style>

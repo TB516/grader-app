@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let ariaLabel = 'Loading';
+  let { ariaLabel = 'Loading' }: { ariaLabel?: string } = $props();
 </script>
 
 <span class="spinner" role="status" aria-label={ariaLabel}></span>
