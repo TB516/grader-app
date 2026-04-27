@@ -7,11 +7,12 @@
 
   type PageStatus = 'starting' | 'running' | 'done' | 'error';
 
-  let pageStatus: PageStatus = 'starting';
-  let errorMessage = '';
-  let projectUrl = '';
-  let projectType: ProjectTypes;
-  let graders: GraderRun[] = [];
+  const projectUrl = searchParams.get('url') as string;
+  const projectType = searchParams.get('assignment') as ProjectTypes;
+
+  let pageStatus = $state<PageStatus>(projectUrl ? 'starting' : 'error');
+  let errorMessage = $state(projectUrl ? '' : 'Missing project URL.');
+  let graders = $state<GraderRun[]>([]);
 
   const completedCount = (): number => graders.filter((run) => run.result !== null).length;
   const statusCount = (status: 'pass' | 'fail' | 'error'): number => graders.filter((run) => run.result?.status === status).length;
@@ -37,17 +38,9 @@
   };
 
   onMount(() => {
-    const projUrl = searchParams.get('url') as string;
-    const projType = (searchParams.get('assignment') as ProjectTypes)!;
-
-    if (!projUrl) {
-      pageStatus = 'error';
-      errorMessage = 'Missing project URL.';
+    if (!projectUrl) {
       return;
     }
-
-    projectUrl = projUrl;
-    projectType = projType;
 
     const unsubscribeFromGraderUpdate = window.api.subscribeToGraderUpdate((run) => {
       mergeGraderRun(run);
@@ -60,7 +53,7 @@
     const startGrading = async (): Promise<void> => {
       try {
         pageStatus = 'running';
-        mergeInitialGraderRuns(await window.api.testProject(projectType, projUrl));
+        mergeInitialGraderRuns(await window.api.testProject(projectType, projectUrl));
       } catch (error) {
         pageStatus = 'error';
         errorMessage = error instanceof Error ? error.message : 'Unable to start grading.';

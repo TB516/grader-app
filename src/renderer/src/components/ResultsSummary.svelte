@@ -14,24 +14,33 @@
     errors: number;
     pending: number;
   } = $props();
-
-  const items: { label: string; value: number }[] = $derived([
-    { label: 'Total', value: total },
-    { label: 'Complete', value: complete },
-    { label: 'Passed', value: passed },
-    { label: 'Failed', value: failed },
-    { label: 'Errors', value: errors },
-    { label: 'Pending', value: pending }
-  ]);
 </script>
 
 <section class="summary" aria-label="Grading summary">
-  {#each items as item (item.label)}
-    <div>
-      <span>{item.label}</span>
-      <strong>{item.value}</strong>
-    </div>
-  {/each}
+  <div>
+    <span>Total</span>
+    <strong>{total}</strong>
+  </div>
+  <div>
+    <span>Complete</span>
+    <strong>{complete}</strong>
+  </div>
+  <div>
+    <span>Passed</span>
+    <strong>{passed}</strong>
+  </div>
+  <div>
+    <span>Failed</span>
+    <strong>{failed}</strong>
+  </div>
+  <div>
+    <span>Errors</span>
+    <strong>{errors}</strong>
+  </div>
+  <div>
+    <span>Pending</span>
+    <strong>{pending}</strong>
+  </div>
 </section>
 
 <style>

@@ -2,17 +2,15 @@
   import type { GraderRun } from '../../../shared/types';
   import DetailsDisclosure from './DetailsDisclosure.svelte';
   import Spinner from './Spinner.svelte';
-  import StatusBadge, { type StatusBadgeStatus } from './StatusBadge.svelte';
+  import StatusBadge from './StatusBadge.svelte';
 
   let { grader }: { grader: GraderRun } = $props();
-
-  const status: StatusBadgeStatus = $derived(grader.result?.status ?? 'pending');
 </script>
 
-<li class={status}>
+<li class={grader.result?.status ?? 'pending'}>
   <div class="grader-heading">
     <h2>{grader.label}</h2>
-    <StatusBadge {status} />
+    <StatusBadge status={grader.result?.status ?? 'pending'} />
   </div>
 
   {#if grader.result}

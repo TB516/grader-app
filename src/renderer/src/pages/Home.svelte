@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { flushSync } from 'svelte';
   import { projects } from '../../../shared/projects';
   import { type ProjectTypes } from '../../../shared/types';
 
-  let selectedProjectType: ProjectTypes = 'Simple HTTP';
+  let selectedProjectType = $state<ProjectTypes>('Simple HTTP');
   let projectUrl = '';
 
   const selectProject = (project: ProjectTypes): void => {
@@ -15,7 +16,9 @@
       startViewTransition?: (update: () => void) => { finished: Promise<void> };
     };
     const updateProject = (): void => {
-      selectedProjectType = project;
+      flushSync(() => {
+        selectedProjectType = project;
+      });
     };
 
     if (transitionDocument.startViewTransition) {
