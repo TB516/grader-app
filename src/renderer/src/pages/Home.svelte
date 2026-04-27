@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { flushSync } from 'svelte';
+  import { cubicOut } from 'svelte/easing';
+  import { fly } from 'svelte/transition';
   import { projects } from '../../../shared/projects';
   import { type ProjectTypes } from '../../../shared/types';
 
   let selectedProjectType = $state<ProjectTypes>('Simple HTTP');
+  let titleDirection = $state(1);
   let projectUrl = '';
 
   const selectProject = (project: ProjectTypes): void => {
@@ -11,26 +13,8 @@
 
     const currentIndex = projects.indexOf(selectedProjectType);
     const nextIndex = projects.indexOf(project);
-    const directionClass = nextIndex > currentIndex ? 'project-transition-down' : 'project-transition-up';
-    const transitionDocument = document as Document & {
-      startViewTransition?: (update: () => void) => { finished: Promise<void> };
-    };
-    const updateProject = (): void => {
-      flushSync(() => {
-        selectedProjectType = project;
-      });
-    };
-
-    if (transitionDocument.startViewTransition) {
-      document.documentElement.classList.add(directionClass);
-      const transition = transitionDocument.startViewTransition(updateProject);
-      void transition.finished.finally(() => {
-        document.documentElement.classList.remove(directionClass);
-      });
-      return;
-    }
-
-    updateProject();
+    titleDirection = nextIndex > currentIndex ? 1 : -1;
+    selectedProjectType = project;
   };
 
   const handleSubmit = (): void => {
@@ -60,7 +44,14 @@
 
     <form onsubmit={handleSubmit}>
       <div class="form-heading">
-        <h2>{selectedProjectType}</h2>
+        {#key selectedProjectType}
+          <h2
+            in:fly={{ y: titleDirection * 28, duration: 260, easing: cubicOut }}
+            out:fly={{ y: titleDirection * -28, duration: 260, easing: cubicOut }}
+          >
+            {selectedProjectType}
+          </h2>
+        {/key}
       </div>
 
       <label for="project-url">Project URL</label>
@@ -181,17 +172,18 @@
   }
 
   .form-heading {
+    display: grid;
     margin-bottom: 54px;
   }
 
   h2 {
+    grid-area: 1 / 1;
     color: #f3f4ef;
     font-size: clamp(2.8rem, 5.1vw, 4.9rem);
     font-weight: 680;
     line-height: 0.9;
     letter-spacing: 0;
     white-space: nowrap;
-    view-transition-name: project-title;
   }
 
   label {
@@ -249,76 +241,6 @@
     margin-top: 18px;
     color: #69716d;
     text-transform: none;
-  }
-
-  :global(::view-transition-old(project-title)),
-  :global(::view-transition-new(project-title)) {
-    animation-duration: 260ms;
-    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  :global(.project-transition-down::view-transition-old(project-title)) {
-    animation-name: title-out-up;
-  }
-
-  :global(.project-transition-down::view-transition-new(project-title)) {
-    animation-name: title-in-up;
-  }
-
-  :global(.project-transition-up::view-transition-old(project-title)) {
-    animation-name: title-out-down;
-  }
-
-  :global(.project-transition-up::view-transition-new(project-title)) {
-    animation-name: title-in-down;
-  }
-
-  @keyframes title-in-up {
-    from {
-      opacity: 0;
-      transform: translateY(28px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes title-out-up {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    to {
-      opacity: 0;
-      transform: translateY(-28px);
-    }
-  }
-
-  @keyframes title-in-down {
-    from {
-      opacity: 0;
-      transform: translateY(-28px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes title-out-down {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    to {
-      opacity: 0;
-      transform: translateY(28px);
-    }
   }
 
   @media (max-width: 760px) {
