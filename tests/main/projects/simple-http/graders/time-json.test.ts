@@ -19,56 +19,56 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeJsonGrader.run(goodTimeJsonUrl);
+  const result = await timeJsonGrader.run(new URL(goodTimeJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeJsonGrader.run(badTimeJsonUrl);
+  const result = await timeJsonGrader.run(new URL(badTimeJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the JSON shape is wrong', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeJsonGrader.run(badShapeTimeJsonUrl);
+  const result = await timeJsonGrader.run(new URL(badShapeTimeJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the time string does not parse', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeJsonGrader.run(timeParseFailureTimeJsonUrl);
+  const result = await timeJsonGrader.run(new URL(timeParseFailureTimeJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the JSON body is invalid', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeJsonGrader.run(invalidJsonTimeJsonUrl);
+  const result = await timeJsonGrader.run(new URL(invalidJsonTimeJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'application/json'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeJsonGrader.run(badContentTypeTimeJsonUrl);
+  const result = await timeJsonGrader.run(new URL(badContentTypeTimeJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeJsonGrader.run(httpErrorTimeJsonUrl);
+  const result = await timeJsonGrader.run(new URL(httpErrorTimeJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeJsonGrader.run(networkErrorTimeJsonUrl);
+  const result = await timeJsonGrader.run(new URL(networkErrorTimeJsonUrl));
 
   expect(result).toMatchObject(expected);
 });

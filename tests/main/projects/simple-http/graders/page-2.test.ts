@@ -10,28 +10,28 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await page2Grader.run(goodPage2BaseUrl);
+  const result = await page2Grader.run(new URL(goodPage2BaseUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await page2Grader.run(badPage2BaseUrl);
+  const result = await page2Grader.run(new URL(badPage2BaseUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await page2Grader.run(httpErrorPage2BaseUrl);
+  const result = await page2Grader.run(new URL(httpErrorPage2BaseUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await page2Grader.run(networkErrorPage2BaseUrl);
+  const result = await page2Grader.run(new URL(networkErrorPage2BaseUrl));
 
   expect(result).toMatchObject(expected);
 });

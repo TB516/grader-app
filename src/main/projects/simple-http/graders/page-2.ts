@@ -3,11 +3,12 @@ import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
+import { projectUrl } from '../../utils/project-url';
 
 export const page2Grader: Grader = {
   label: 'Page 2 Returns HTML',
   run: async (url) => {
-    const response = await t(fetch, `${url}/page2`);
+    const response = await t(fetch, projectUrl(url, '/page2'));
     if (!response.ok) return fetchErrorResult(response.error);
 
     let failure = httpStatusCheck(response.value, 200);

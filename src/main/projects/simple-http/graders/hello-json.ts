@@ -3,13 +3,14 @@ import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
+import { projectUrl } from '../../utils/project-url';
 
 const EXPECTED_MESSAGE = 'Hello World';
 
 export const helloJsonGrader: Grader = {
   label: 'Hello JSON Endpoint Returns {"message":"Hello World"}',
   run: async (url) => {
-    const response = await t(fetch, `${url}/helloJSON`);
+    const response = await t(fetch, projectUrl(url, '/helloJSON'));
     if (!response.ok) return fetchErrorResult(response.error);
 
     let failure = httpStatusCheck(response.value, 200);

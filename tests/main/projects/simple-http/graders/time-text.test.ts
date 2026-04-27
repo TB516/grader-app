@@ -17,42 +17,42 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(goodTimeTextBaseUrl);
+  const result = await timeTextGrader.run(new URL(goodTimeTextBaseUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(badTimeTextBaseUrl);
+  const result = await timeTextGrader.run(new URL(badTimeTextBaseUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(httpErrorTimeTextBaseUrl);
+  const result = await timeTextGrader.run(new URL(httpErrorTimeTextBaseUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(networkErrorTimeTextBaseUrl);
+  const result = await timeTextGrader.run(new URL(networkErrorTimeTextBaseUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the time string does not parse', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(timeParseFailureTimeTextBaseUrl);
+  const result = await timeTextGrader.run(new URL(timeParseFailureTimeTextBaseUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'text/plain'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await timeTextGrader.run(badContentTypeTimeTextBaseUrl);
+  const result = await timeTextGrader.run(new URL(badContentTypeTimeTextBaseUrl));
 
   expect(result).toMatchObject(expected);
 });

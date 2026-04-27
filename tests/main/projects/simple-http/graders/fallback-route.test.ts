@@ -16,35 +16,35 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(goodFallbackRouteUrl);
+  const result = await fallbackRouteGrader.run(new URL(goodFallbackRouteUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(badFallbackRouteUrl);
+  const result = await fallbackRouteGrader.run(new URL(badFallbackRouteUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'text/html'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(badContentTypeFallbackRouteUrl);
+  const result = await fallbackRouteGrader.run(new URL(badContentTypeFallbackRouteUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(httpErrorFallbackRouteUrl);
+  const result = await fallbackRouteGrader.run(new URL(httpErrorFallbackRouteUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(networkErrorFallbackRouteUrl);
+  const result = await fallbackRouteGrader.run(new URL(networkErrorFallbackRouteUrl));
 
   expect(result).toMatchObject(expected);
 });

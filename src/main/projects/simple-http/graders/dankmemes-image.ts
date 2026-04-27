@@ -3,13 +3,14 @@ import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
+import { projectUrl } from '../../utils/project-url';
 
 const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10];
 
 export const dankmemesImageGrader: Grader = {
   label: 'Dankmemes Endpoint Returns PNG',
   run: async (url) => {
-    const response = await t(fetch, `${url}/dankmemes`);
+    const response = await t(fetch, projectUrl(url, '/dankmemes'));
     if (!response.ok) return fetchErrorResult(response.error);
 
     let failure = httpStatusCheck(response.value, 200);

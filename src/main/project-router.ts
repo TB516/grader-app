@@ -2,7 +2,9 @@ import type { ProjectTypes, GraderRun } from '../shared/types';
 import { simpleHttpRunner } from './projects/simple-http';
 import type { StreamingDoneFunction, StreamRunnerResultFunction } from './types';
 
-const projectRouter = (e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes, url: string): GraderRun[] => {
+const projectRouter = (e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes, serializedUrl: string): GraderRun[] => {
+  const url = new URL(serializedUrl);
+
   const stream: StreamRunnerResultFunction = (run: GraderRun) => {
     e.sender.send('grader:run', run);
   };

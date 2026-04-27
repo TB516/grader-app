@@ -6,5 +6,5 @@ export type StreamingDoneFunction = VoidFunction;
 
 export type Grader = {
   label: string;
-  run: (url: string) => Promise<GraderResult>;
+  run: (url: URL) => Promise<GraderResult>;
 };

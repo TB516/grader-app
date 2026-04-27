@@ -16,35 +16,35 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(goodHelloTextUrl);
+  const result = await helloTextGrader.run(new URL(goodHelloTextUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(badHelloTextUrl);
+  const result = await helloTextGrader.run(new URL(badHelloTextUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'text/plain'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(badContentTypeHelloTextUrl);
+  const result = await helloTextGrader.run(new URL(badContentTypeHelloTextUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(httpErrorHelloTextUrl);
+  const result = await helloTextGrader.run(new URL(httpErrorHelloTextUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(networkErrorHelloTextUrl);
+  const result = await helloTextGrader.run(new URL(networkErrorHelloTextUrl));
 
   expect(result).toMatchObject(expected);
 });

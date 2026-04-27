@@ -20,7 +20,7 @@ const graders: Grader[] = [
   fallbackRouteGrader
 ];
 
-export const simpleHttpRunner = (url: string, send: StreamRunnerResultFunction, done: StreamingDoneFunction): GraderRun[] => {
+export const simpleHttpRunner = (url: URL, send: StreamRunnerResultFunction, done: StreamingDoneFunction): GraderRun[] => {
   const runs: GraderRun[] = graders.map((grader) => ({ label: grader.label, result: null }));
 
   Promise.all(

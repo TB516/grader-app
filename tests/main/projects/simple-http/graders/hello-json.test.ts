@@ -17,42 +17,42 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloJsonGrader.run(goodHelloJsonUrl);
+  const result = await helloJsonGrader.run(new URL(goodHelloJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloJsonGrader.run(badHelloJsonUrl);
+  const result = await helloJsonGrader.run(new URL(badHelloJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the JSON body is invalid', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloJsonGrader.run(invalidJsonHelloJsonUrl);
+  const result = await helloJsonGrader.run(new URL(invalidJsonHelloJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'application/json'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloJsonGrader.run(badContentTypeHelloJsonUrl);
+  const result = await helloJsonGrader.run(new URL(badContentTypeHelloJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloJsonGrader.run(httpErrorHelloJsonUrl);
+  const result = await helloJsonGrader.run(new URL(httpErrorHelloJsonUrl));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloJsonGrader.run(networkErrorHelloJsonUrl);
+  const result = await helloJsonGrader.run(new URL(networkErrorHelloJsonUrl));
 
   expect(result).toMatchObject(expected);
 });

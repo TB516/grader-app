@@ -7,7 +7,7 @@ import { httpStatusCheck } from '../../utils/http-status-check';
 export const indexPageGrader: Grader = {
   label: 'Index Page Returns HTML',
   run: async (url) => {
-    const response = await t(fetch, url);
+    const response = await t(fetch, new URL(url));
     if (!response.ok) return fetchErrorResult(response.error);
 
     let failure = httpStatusCheck(response.value, 200);

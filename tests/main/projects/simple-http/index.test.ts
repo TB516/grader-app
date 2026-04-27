@@ -10,7 +10,7 @@ test('Runner returns the full grader list and streams results', async () => {
   const send = vi.fn();
   const done = vi.fn();
 
-  const runs = simpleHttpRunner('https://good.simple-http.com', send, done);
+  const runs = simpleHttpRunner(new URL('https://good.simple-http.com'), send, done);
 
   expect(runs).toEqual([
     { label: 'Index Page Returns HTML', result: null },
@@ -33,5 +33,21 @@ test('Runner returns the full grader list and streams results', async () => {
       label: expect.any(String),
       result: { status: expect.stringMatching(/pass|fail|error/), message: expect.any(String) }
     });
+  }
+});
+
+test('Runner accepts project URLs with a trailing slash', async () => {
+  const send = vi.fn();
+  const done = vi.fn();
+
+  simpleHttpRunner(new URL('https://good.simple-http.com/'), send, done);
+
+  await vi.waitFor(() => {
+    expect(send).toHaveBeenCalledTimes(8);
+    expect(done).toHaveBeenCalledTimes(1);
+  });
+
+  for (const call of send.mock.calls) {
+    expect(call[0].result.status).toBe('pass');
   }
 });

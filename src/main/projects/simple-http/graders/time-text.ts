@@ -5,6 +5,7 @@ import { contentTypeCheck } from '../../utils/content-type-check';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { parseTimeString } from '../../utils/parse-time-string';
+import { projectUrl } from '../../utils/project-url';
 
 export const WIGGLE_ROOM = 60;
 
@@ -12,7 +13,7 @@ export const timeTextGrader: Grader = {
   label: 'Time Endpoint Returns Correct Time',
   run: async (url) => {
     const expectedTime = Temporal.Now.plainTimeISO('UTC');
-    const response = await t(fetch, `${url}/time`);
+    const response = await t(fetch, projectUrl(url, '/time'));
     if (!response.ok) return fetchErrorResult(response.error);
 
     let failure = httpStatusCheck(response.value, 200);
