@@ -1,6 +1,7 @@
 <script lang="ts">
   import { searchParams } from 'sv-router';
   import { onMount } from 'svelte';
+  import Spinner from '../components/Spinner.svelte';
   import type { GraderRun, ProjectTypes } from '../../../shared/types';
 
   type PageStatus = 'starting' | 'running' | 'done' | 'error';
@@ -12,6 +13,9 @@
   let graders: GraderRun[] = [];
 
   const statusLabel = (run: GraderRun): string => run.result?.status ?? 'pending';
+  const completedCount = (): number => graders.filter((run) => run.result !== null).length;
+  const statusCount = (status: 'pass' | 'fail' | 'error'): number => graders.filter((run) => run.result?.status === status).length;
+  const pendingCount = (): number => graders.filter((run) => run.result === null).length;
 
   const mergeGraderRun = (incomingRun: GraderRun): void => {
     const existingIndex = graders.findIndex((run) => run.label === incomingRun.label);
@@ -76,12 +80,16 @@
   <title>Grading Results</title>
 </svelte:head>
 
-<main>
-  <header>
-    <p>{projectType ?? 'Project'} results</p>
-    <h1>Grading Results</h1>
-    {#if projectUrl}
-      <a href={projectUrl}>{projectUrl}</a>
+<main class="results-shell">
+  <header class="topbar">
+    <div>
+      <p>{projectType ?? 'Project'}</p>
+      {#if projectUrl}
+        <a href={projectUrl}>{projectUrl}</a>
+      {/if}
+    </div>
+    {#if pageStatus !== 'done'}
+      <span class:running={pageStatus === 'running'} class:error={pageStatus === 'error'}>{pageStatus}</span>
     {/if}
   </header>
 
@@ -97,20 +105,24 @@
         <strong>{graders.length}</strong>
       </div>
       <div>
+        <span>Complete</span>
+        <strong>{completedCount()}</strong>
+      </div>
+      <div>
         <span>Passed</span>
-        <strong>{graders.filter((run) => run.result?.status === 'pass').length}</strong>
+        <strong>{statusCount('pass')}</strong>
       </div>
       <div>
         <span>Failed</span>
-        <strong>{graders.filter((run) => run.result?.status === 'fail').length}</strong>
+        <strong>{statusCount('fail')}</strong>
       </div>
       <div>
         <span>Errors</span>
-        <strong>{graders.filter((run) => run.result?.status === 'error').length}</strong>
+        <strong>{statusCount('error')}</strong>
       </div>
       <div>
         <span>Pending</span>
-        <strong>{graders.filter((run) => run.result === null).length}</strong>
+        <strong>{pendingCount()}</strong>
       </div>
     </section>
 
@@ -136,11 +148,17 @@
             {#if grader.result}
               <p>{grader.result.message}</p>
 
-              {#if grader.result.details}
-                <pre>{grader.result.details}</pre>
+              {#if grader.result.details && grader.result.status !== 'pass'}
+                <details>
+                  <summary>Details</summary>
+                  <pre>{grader.result.details}</pre>
+                </details>
               {/if}
             {:else}
-              <p>Pending</p>
+              <p class="pending-message">
+                <Spinner ariaLabel="Waiting for grader result" />
+                Waiting for result
+              </p>
             {/if}
           </li>
         {/each}
@@ -150,121 +168,159 @@
 </main>
 
 <style>
+  :global(*) {
+    box-sizing: border-box;
+  }
+
   :global(body) {
-    min-width: 560px;
-    color: #17202a;
-    background: #f6f8fb;
+    min-width: 720px;
+    color: #f3f4ef;
+    background: #08090b;
     font-family:
-      Inter,
+      Aptos,
+      'Segoe UI Variable',
+      'Segoe UI',
       ui-sans-serif,
       system-ui,
       -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
       sans-serif;
+    font-feature-settings: 'ss01' on;
   }
 
-  main {
-    width: min(960px, calc(100vw - 48px));
+  .results-shell {
+    width: min(1180px, calc(100vw - 56px));
+    min-height: 100vh;
     margin: 0 auto;
-    padding: 40px 0;
+    padding: 30px 0 48px;
   }
 
-  header {
-    margin-bottom: 28px;
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
   }
 
-  header p,
-  header a {
-    margin: 0;
-    color: #5c6b7a;
-    font-size: 0.95rem;
+  .topbar p,
+  .topbar a {
+    color: #7f8782;
+    font-size: 0.9rem;
   }
 
-  header a {
+  .topbar a {
     display: inline-block;
     max-width: 100%;
+    margin-top: 5px;
+    color: #aeb8b1;
     overflow-wrap: anywhere;
+    text-decoration-color: rgb(174 184 177 / 35%);
+    text-underline-offset: 3px;
   }
 
-  h1 {
-    margin: 8px 0;
-    font-size: 2.2rem;
-    line-height: 1.1;
+  .topbar > span {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    padding: 7px 11px;
+    color: #aeb8b1;
+    background: #111417;
+    text-transform: capitalize;
+    font-size: 0.84rem;
+    font-weight: 800;
+  }
+
+  .topbar > span.running {
+    color: #111507;
+    background: #22c55e;
+  }
+
+  .topbar > span.error {
+    color: #180b0b;
+    background: #ef4444;
   }
 
   .summary {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
     margin-bottom: 18px;
-  }
-
-  .summary div,
-  .notice,
-  .graders li {
-    border: 1px solid #d8e0ea;
-    border-radius: 8px;
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgb(25 38 52 / 6%);
+    padding: 12px 0;
+    background: rgb(8 9 11 / 92%);
+    backdrop-filter: blur(12px);
   }
 
   .summary div {
-    padding: 14px;
+    padding: 12px 0;
   }
 
   .summary span {
     display: block;
-    color: #657386;
-    font-size: 0.82rem;
+    color: #717a75;
+    font-size: 0.76rem;
+    font-weight: 650;
+    text-transform: uppercase;
   }
 
   .summary strong {
     display: block;
-    margin-top: 4px;
-    font-size: 1.55rem;
+    margin-top: 6px;
+    color: #f3f4ef;
+    font-size: 2rem;
+    font-weight: 680;
+    line-height: 1;
   }
 
   .notice {
-    padding: 22px;
+    margin-top: 24px;
+    padding: 18px;
+    border-radius: 6px;
+    background: #111417;
   }
 
   .notice p {
     margin: 8px 0 0;
-    color: #5c6b7a;
+    color: #aeb8b1;
   }
 
   .notice.error {
-    border-color: #f2b6b6;
-    background: #fff7f7;
+    color: #ffd6dc;
+    background: #1a1012;
   }
 
   .graders {
-    display: grid;
-    gap: 12px;
     padding: 0;
     list-style: none;
   }
 
   .graders li {
-    padding: 18px;
-    border-left-width: 6px;
-  }
-
-  .graders li.pending {
-    border-left-color: #9aa8b7;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+    gap: 22px;
+    padding: 20px 0;
+    border-bottom: 1px solid #1b2023;
   }
 
   .graders li.pass {
-    border-left-color: #21845a;
+    border-left: 3px solid #22c55e;
+    padding-left: 16px;
   }
 
   .graders li.fail {
-    border-left-color: #c94835;
+    border-left: 3px solid #ef4444;
+    padding-left: 16px;
   }
 
   .graders li.error {
-    border-left-color: #a747c9;
+    border-left: 3px solid #facc15;
+    padding-left: 16px;
+  }
+
+  .graders li.pending {
+    border-left: 3px solid #6b7280;
+    padding-left: 16px;
   }
 
   .grader-heading {
@@ -276,16 +332,19 @@
 
   h2 {
     margin: 0;
-    font-size: 1rem;
+    color: #f3f4ef;
+    font-size: 1.05rem;
+    font-weight: 680;
+    line-height: 1.35;
   }
 
   .grader-heading span {
     flex: 0 0 auto;
     min-width: 76px;
-    border-radius: 999px;
     padding: 5px 10px;
-    color: #ffffff;
-    background: #697789;
+    border-radius: 999px;
+    color: #aeb8b1;
+    background: #111417;
     text-align: center;
     text-transform: capitalize;
     font-size: 0.78rem;
@@ -293,49 +352,90 @@
   }
 
   .pass .grader-heading span {
-    background: #21845a;
+    color: #06130a;
+    background: #22c55e;
   }
 
   .fail .grader-heading span {
-    background: #c94835;
+    color: #fff1f2;
+    background: #991b1b;
   }
 
   .error .grader-heading span {
-    background: #a747c9;
+    color: #1c1400;
+    background: #facc15;
+  }
+
+  .pending .grader-heading span {
+    color: #e5e7eb;
+    background: #374151;
   }
 
   .graders p {
-    margin: 10px 0 0;
-    color: #4d5b6a;
+    margin: 0;
+    color: #aeb8b1;
+    line-height: 1.5;
+  }
+
+  .pending-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  details {
+    margin-top: 12px;
+  }
+
+  summary {
+    width: fit-content;
+    color: #dce3dd;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  summary::marker {
+    color: #7f8782;
   }
 
   pre {
     overflow-x: auto;
     margin: 12px 0 0;
-    border-radius: 6px;
-    padding: 12px;
-    background: #111827;
-    color: #edf2f7;
+    border-left: 1px solid #323a36;
+    padding: 4px 0 4px 14px;
+    color: #dce3dd;
     white-space: pre-wrap;
+    line-height: 1.45;
   }
 
-  @media (max-width: 700px) {
+  @media (max-width: 760px) {
     :global(body) {
       min-width: 0;
     }
 
-    main {
-      width: min(100% - 28px, 960px);
+    .results-shell {
+      width: min(100% - 32px, 960px);
       padding: 24px 0;
     }
 
-    .summary {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .topbar {
+      flex-direction: column;
+      align-items: flex-start;
     }
 
-    .grader-heading {
-      flex-direction: column;
-      gap: 10px;
+    .summary {
+      position: static;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .summary div {
+      padding-bottom: 8px;
+    }
+
+    .graders li {
+      grid-template-columns: 1fr;
+      gap: 12px;
     }
   }
 </style>
