@@ -1,6 +1,7 @@
 import { t } from 'try';
 import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
+import { errorDetails, responseDetails } from '../../utils/details';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { projectUrl } from '../../utils/project-url';
@@ -20,12 +21,12 @@ export const dankmemesImageGrader: Grader = {
     if (failure) return failure;
 
     const buffer = await t(async () => new Uint8Array(await response.value.arrayBuffer()));
-    if (!buffer.ok) return { status: 'error', message: 'Image parsing failed', details: JSON.stringify(buffer.error) };
-    if (buffer.value.length === 0) return { status: 'fail', message: 'Image body was empty', details: JSON.stringify(response.value) };
+    if (!buffer.ok) return { status: 'error', message: 'Image parsing failed', details: errorDetails(buffer.error) };
+    if (buffer.value.length === 0) return { status: 'fail', message: 'Image body was empty', details: responseDetails(response.value) };
 
     const isPng = PNG_SIGNATURE.every((byte, index) => buffer.value[index] === byte);
     if (!isPng) return { status: 'fail', message: 'Image body was not a PNG file', details: JSON.stringify([...buffer.value.slice(0, 8)]) };
 
-    return { status: 'pass', message: 'Dankmemes endpoint returned a PNG image', details: JSON.stringify(response.value) };
+    return { status: 'pass', message: 'Dankmemes endpoint returned a PNG image', details: responseDetails(response.value) };
   }
 };
