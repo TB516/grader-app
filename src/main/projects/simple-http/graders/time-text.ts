@@ -2,6 +2,7 @@ import { Temporal } from 'temporal-polyfill';
 import { t } from 'try';
 import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
+import { errorDetails, responseDetails } from '../../utils/details';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { parseTimeString } from '../../utils/parse-time-string';
@@ -23,10 +24,10 @@ export const timeTextGrader: Grader = {
     if (failure) return failure;
 
     const text = await t(async () => await response.value.text());
-    if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: JSON.stringify(text.error) };
+    if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: errorDetails(text.error) };
 
     const responseTime = parseTimeString(text.value);
-    if (!responseTime) return { status: 'fail', message: `Failed to parse time '${text.value}'`, details: JSON.stringify(response.value) };
+    if (!responseTime) return { status: 'fail', message: `Failed to parse time '${text.value}'`, details: responseDetails(response.value) };
 
     const diff = Math.abs(responseTime.until(expectedTime).total({ unit: 'seconds' }));
     const wrappedDif = Math.min(diff, 86400 - diff);
@@ -35,13 +36,13 @@ export const timeTextGrader: Grader = {
       return {
         status: 'fail',
         message: `Text was '${text.value}', which is not '${expectedTime.toString()}' +/- ${WIGGLE_ROOM}s`,
-        details: JSON.stringify(response.value)
+        details: responseDetails(response.value)
       };
 
     return {
       status: 'pass',
       message: `Text was '${text.value}', which is '${expectedTime.toString()}' +/- ${WIGGLE_ROOM}s`,
-      details: JSON.stringify(response.value)
+      details: responseDetails(response.value)
     };
   }
 };

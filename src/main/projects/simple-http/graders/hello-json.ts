@@ -1,6 +1,7 @@
 import { t } from 'try';
 import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
+import { responseDetails } from '../../utils/details';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { projectUrl } from '../../utils/project-url';
@@ -20,7 +21,7 @@ export const helloJsonGrader: Grader = {
     if (failure) return failure;
 
     const json = await t(async () => await response.value.json());
-    if (!json.ok) return { status: 'fail', message: 'JSON parsing failed', details: JSON.stringify(response.value) };
+    if (!json.ok) return { status: 'fail', message: 'JSON parsing failed', details: responseDetails(response.value) };
 
     if (typeof json.value !== 'object' || json.value === null || json.value.message !== EXPECTED_MESSAGE || Object.keys(json.value).length !== 1) {
       return {

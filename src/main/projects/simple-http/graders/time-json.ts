@@ -2,6 +2,7 @@ import { Temporal } from 'temporal-polyfill';
 import { t } from 'try';
 import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
+import { responseDetails } from '../../utils/details';
 import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { parseTimeString } from '../../utils/parse-time-string';
@@ -22,7 +23,7 @@ export const timeJsonGrader: Grader = {
     if (failure) return failure;
 
     const json = await t(async () => await response.value.json());
-    if (!json.ok) return { status: 'fail', message: 'JSON parsing failed', details: JSON.stringify(response.value) };
+    if (!json.ok) return { status: 'fail', message: 'JSON parsing failed', details: responseDetails(response.value) };
 
     if (typeof json.value !== 'object' || json.value === null || typeof json.value.time !== 'string' || Object.keys(json.value).length !== 1) {
       return { status: 'fail', message: 'JSON did not contain a valid "time" string', details: JSON.stringify(json.value) };
