@@ -1,4 +1,5 @@
 import type { ProjectTypes, GraderRun } from '../shared/types';
+import { httpApi1Runner } from './projects/http-api-1';
 import { simpleHttpRunner } from './projects/simple-http';
 import { streamingMediaRunner } from './projects/streaming-media';
 import type { StreamingDoneFunction, StreamRunnerResultFunction } from './types';
@@ -20,7 +21,7 @@ const projectRouter = (e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes,
     case 'Streaming Media':
       return streamingMediaRunner(url, stream, done);
     case 'HTTP API I':
-      return simpleHttpRunner(url, stream, done);
+      return httpApi1Runner(url, stream, done);
     case 'HTTP API II':
       return simpleHttpRunner(url, stream, done);
     case 'Simple Models':
