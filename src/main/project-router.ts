@@ -1,4 +1,5 @@
 import type { ProjectTypes, GraderRun } from '../shared/types';
+import { httpApi2Runner } from './projects/http-api-2';
 import { simpleHttpRunner } from './projects/simple-http';
 import { streamingMediaRunner } from './projects/streaming-media';
 import type { StreamingDoneFunction, StreamRunnerResultFunction } from './types';
@@ -22,7 +23,7 @@ const projectRouter = (e: Electron.IpcMainInvokeEvent, assignment: ProjectTypes,
     case 'HTTP API I':
       return simpleHttpRunner(url, stream, done);
     case 'HTTP API II':
-      return simpleHttpRunner(url, stream, done);
+      return httpApi2Runner(url, stream, done);
     case 'Simple Models':
       return simpleHttpRunner(url, stream, done);
     case 'Domomaker C':

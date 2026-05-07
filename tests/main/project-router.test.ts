@@ -1,8 +1,13 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 import { projectRouter } from '../../src/main/project-router';
+import { httpApi2Runner } from '../../src/main/projects/http-api-2';
 import { simpleHttpRunner } from '../../src/main/projects/simple-http';
 import { streamingMediaRunner } from '../../src/main/projects/streaming-media';
 import { projects } from '../../src/shared/projects';
+
+vi.mock('../../src/main/projects/http-api-2', () => ({
+  httpApi2Runner: vi.fn(() => [])
+}));
 
 vi.mock('../../src/main/projects/simple-http', () => ({
   simpleHttpRunner: vi.fn(() => [])
@@ -22,16 +27,20 @@ const event = {
   }
 } as unknown as Electron.IpcMainInvokeEvent;
 
-test.each(projects.filter((project) => project !== 'Streaming Media'))('Router passes the project URL through for %s', (assignment) => {
-  projectRouter(event, assignment, 'https://good.simple-http.com/');
+test.each(projects.filter((project) => project !== 'Streaming Media' && project !== 'HTTP API II'))(
+  'Router passes the project URL through for %s',
+  (assignment) => {
+    projectRouter(event, assignment, 'https://good.simple-http.com/');
 
-  const url = vi.mocked(simpleHttpRunner).mock.calls[0][0];
+    const url = vi.mocked(simpleHttpRunner).mock.calls[0][0];
 
-  expect(url).toBeInstanceOf(URL);
-  expect(url.toString()).toBe('https://good.simple-http.com/');
-  expect(simpleHttpRunner).toHaveBeenCalledWith(url, expect.any(Function), expect.any(Function));
-  expect(streamingMediaRunner).not.toHaveBeenCalled();
-});
+    expect(url).toBeInstanceOf(URL);
+    expect(url.toString()).toBe('https://good.simple-http.com/');
+    expect(simpleHttpRunner).toHaveBeenCalledWith(url, expect.any(Function), expect.any(Function));
+    expect(streamingMediaRunner).not.toHaveBeenCalled();
+    expect(httpApi2Runner).not.toHaveBeenCalled();
+  }
+);
 
 test('Router sends Streaming Media to the streaming media runner', () => {
   projectRouter(event, 'Streaming Media', 'https://good.streaming-media.com/');
@@ -42,4 +51,17 @@ test('Router sends Streaming Media to the streaming media runner', () => {
   expect(url.toString()).toBe('https://good.streaming-media.com/');
   expect(streamingMediaRunner).toHaveBeenCalledWith(url, expect.any(Function), expect.any(Function));
   expect(simpleHttpRunner).not.toHaveBeenCalled();
+  expect(httpApi2Runner).not.toHaveBeenCalled();
+});
+
+test('Router sends HTTP API II to the HTTP API II runner', () => {
+  projectRouter(event, 'HTTP API II', 'https://good.http-api-2.com/');
+
+  const url = vi.mocked(httpApi2Runner).mock.calls[0][0];
+
+  expect(url).toBeInstanceOf(URL);
+  expect(url.toString()).toBe('https://good.http-api-2.com/');
+  expect(httpApi2Runner).toHaveBeenCalledWith(url, expect.any(Function), expect.any(Function));
+  expect(simpleHttpRunner).not.toHaveBeenCalled();
+  expect(streamingMediaRunner).not.toHaveBeenCalled();
 });

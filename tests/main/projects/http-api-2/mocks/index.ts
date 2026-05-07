@@ -1,0 +1,58 @@
+import { setupServer } from 'msw/node';
+import {
+  badAddUserCreateStatusHandlers,
+  badAddUserNoPersistHandlers,
+  badAddUserNoUpdateHandlers,
+  badAddUserUpdateStatusHandlers,
+  badContentTypeGetUsersGetHandler,
+  badGetUsersGetHandler,
+  badGetUsersHeadContentTypeHandler,
+  badGetUsersHeadStatusHandler,
+  badIndexPageHandler,
+  badNotRealGetContentTypeHandler,
+  badNotRealGetShapeHandler,
+  badNotRealGetStatusHandler,
+  badNotRealHeadContentTypeHandler,
+  badNotRealHeadStatusHandler,
+  badStyleCssHandler,
+  badUnknownRouteJsonHandler,
+  badUnknownRouteStatusHandler,
+  emptyIndexPageHandler,
+  emptyStyleCssHandler,
+  goodHttpApi2Handlers,
+  httpErrorGetUsersGetHandler,
+  httpErrorIndexPageHandler,
+  httpErrorStyleCssHandler,
+  invalidJsonGetUsersGetHandler,
+  networkErrorIndexPageHandler
+} from './http-api-2-handlers';
+
+export const server = setupServer(
+  ...[
+    ...goodHttpApi2Handlers,
+    badIndexPageHandler,
+    emptyIndexPageHandler,
+    httpErrorIndexPageHandler,
+    networkErrorIndexPageHandler,
+    badStyleCssHandler,
+    emptyStyleCssHandler,
+    httpErrorStyleCssHandler,
+    badGetUsersGetHandler,
+    invalidJsonGetUsersGetHandler,
+    badContentTypeGetUsersGetHandler,
+    httpErrorGetUsersGetHandler,
+    badGetUsersHeadStatusHandler,
+    badGetUsersHeadContentTypeHandler,
+    badNotRealGetStatusHandler,
+    badNotRealGetShapeHandler,
+    badNotRealGetContentTypeHandler,
+    badNotRealHeadStatusHandler,
+    badNotRealHeadContentTypeHandler,
+    badUnknownRouteStatusHandler,
+    badUnknownRouteJsonHandler,
+    ...badAddUserCreateStatusHandlers,
+    ...badAddUserNoPersistHandlers,
+    ...badAddUserUpdateStatusHandlers,
+    ...badAddUserNoUpdateHandlers
+  ]
+);
