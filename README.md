@@ -11,24 +11,24 @@ An Electron application with Svelte and TypeScript
 ### Install
 
 ```bash
-$ bun install
+$ pnpm install
 ```
 
 ### Development
 
 ```bash
-$ bun dev
+$ pnpm dev
 ```
 
 ### Build
 
 ```bash
 # For windows
-$ bun build:win
+$ pnpm build:win
 
 # For macOS
-$ bun build:mac
+$ pnpm build:mac
 
 # For Linux
-$ bun build:linux
+$ pnpm build:linux
 ```

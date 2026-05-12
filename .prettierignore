@@ -1,4 +1,4 @@
 out
 dist
-bun.lock
+pnpm-lock.yaml
 LICENSE.md
