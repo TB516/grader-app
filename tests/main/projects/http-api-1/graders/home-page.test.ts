@@ -7,6 +7,15 @@ import {
   emptyHomePageUrl,
   goodHttpApi1Url,
   httpErrorHomePageUrl,
+  missingHomePageAcceptHeaderUrl,
+  missingHomePageConsoleLogUrl,
+  missingHomePageContentTypeBranchUrl,
+  missingHomePageCssLinkUrl,
+  missingHomePageJsonParseUrl,
+  missingHomePageRouteControlsUrl,
+  missingHomePageSendTriggerUrl,
+  missingHomePageTypeControlsUrl,
+  missingHomePageXmlHandlingUrl,
   networkErrorHomePageUrl
 } from '../mocks/http-api-1-handlers';
 
@@ -17,6 +26,23 @@ afterAll(() => server.close());
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
   const result = await homePageGrader.run(new URL(goodHttpApi1Url));
+
+  expect(result).toMatchObject(expected);
+});
+
+test.each([
+  ['CSS link is missing', missingHomePageCssLinkUrl],
+  ['route selection controls are missing', missingHomePageRouteControlsUrl],
+  ['response type controls are missing', missingHomePageTypeControlsUrl],
+  ['send trigger is missing', missingHomePageSendTriggerUrl],
+  ['Accept header usage is missing', missingHomePageAcceptHeaderUrl],
+  ['Content-Type branch logic is missing', missingHomePageContentTypeBranchUrl],
+  ['JSON parse path is missing', missingHomePageJsonParseUrl],
+  ['XML handling path is missing', missingHomePageXmlHandlingUrl],
+  ['raw console logging is missing', missingHomePageConsoleLogUrl]
+])('Grader fails if home page %s', async (_label, url) => {
+  const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
+  const result = await homePageGrader.run(new URL(url));
 
   expect(result).toMatchObject(expected);
 });

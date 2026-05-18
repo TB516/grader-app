@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
 import { httpApi1Runner } from '../../../../src/main/projects/http-api-1';
 import { server } from './mocks';
-import { goodHttpApi1Url } from './mocks/http-api-1-handlers';
+import { goodHttpApi1InternalErrorUrl, goodHttpApi1Url } from './mocks/http-api-1-handlers';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
@@ -38,7 +38,7 @@ test('Runner accepts project URLs with a trailing slash', async () => {
   const send = vi.fn();
   const done = vi.fn();
 
-  httpApi1Runner(new URL(`${goodHttpApi1Url}/`), send, done);
+  httpApi1Runner(new URL(`${goodHttpApi1InternalErrorUrl}/`), send, done);
 
   await vi.waitFor(() => {
     expect(send).toHaveBeenCalledTimes(5);

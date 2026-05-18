@@ -5,6 +5,7 @@ import { server } from '../mocks';
 import {
   badXmlContentTypeUrl,
   badXmlStatusUrl,
+  goodHttpApi1InternalErrorUrl,
   goodHttpApi1Url,
   missingXmlMessageUrl,
   networkErrorApiUrl,
@@ -18,6 +19,13 @@ afterAll(() => server.close());
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
   const result = await xmlEndpointsGrader.run(new URL(goodHttpApi1Url));
+
+  expect(result).toMatchObject(expected);
+});
+
+test('Grader passes when /internal uses internalError id variant', async () => {
+  const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
+  const result = await xmlEndpointsGrader.run(new URL(goodHttpApi1InternalErrorUrl));
 
   expect(result).toMatchObject(expected);
 });
