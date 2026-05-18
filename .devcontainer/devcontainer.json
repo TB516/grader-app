@@ -1,0 +1,40 @@
+{
+  "name": "grader-app",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24"
+    }
+  },
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [6080, 5173],
+  "portsAttributes": {
+    "6080": {
+      "label": "Electron Desktop",
+      "onAutoForward": "openBrowser"
+    },
+    "5173": {
+      "label": "Vite Renderer"
+    }
+  },
+  "containerEnv": {
+    "DISPLAY": ":0",
+    "LIBGL_ALWAYS_SOFTWARE": "1"
+  },
+  "postCreateCommand": "bash -lc 'corepack enable && corepack prepare pnpm@latest --activate && pnpm install'",
+  "postStartCommand": "bash -lc '.devcontainer/scripts/start-desktop.sh'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "svelte.svelte-vscode",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}
