@@ -10,7 +10,7 @@
     "lint": "eslint --cache --fix .",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
-    "typecheck": "pnpm typecheck:node && pnpm svelte-check",
+    "typecheck": "pnpm typecheck:node && pnpm typecheck:tests && pnpm svelte-check",
     "dev": "electron-vite dev",
     "build": "pnpm typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
@@ -18,13 +18,17 @@
     "build:win": "pnpm build && electron-builder --win",
     "build:mac": "pnpm build && electron-builder --mac",
     "build:linux": "pnpm build && electron-builder --linux",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "vitest run",
+    "typecheck:tests": "tsc --noEmit -p tsconfig.test-node.json --composite false"
   },
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
+    "@xmldom/xmldom": "^0.9.12",
     "electron-updater": "^6.8.3",
     "temporal-polyfill": "^0.3.2",
-    "try": "^1.0.3"
+    "try": "^1.0.3",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
