@@ -10,7 +10,7 @@ import type { Session } from './session';
 export const testAccount = () => ({ username: `gr${randomUUID().replaceAll('-', '').slice(0, 12)}`, pass: randomUUID() });
 type Account = ReturnType<typeof testAccount>;
 
-/** Load the authenticated maker form and visible page text. */
+/** Load the authenticated maker page and check its creation form. */
 export const readMaker = Effect.fn(function* (session: Session) {
   return yield* readFormPage(yield* session.request('/maker'), session.baseUrl, '/maker', { name: ['text'], age: ['text', 'number'] });
 });

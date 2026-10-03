@@ -36,7 +36,8 @@ function createWindow({ width = 900, height = 670, path, query }: createWindowAr
   });
 
   window.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
+    const protocol = URL.parse(details.url)?.protocol;
+    if (protocol === 'http:' || protocol === 'https:') void shell.openExternal(details.url);
     return { action: 'deny' };
   });
 

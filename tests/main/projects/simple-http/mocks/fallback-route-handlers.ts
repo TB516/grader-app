@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 
-const INDEX_HTML = '<html><body><h1>Index</h1></body></html>';
+const INDEX_HTML = '<html><body><h1>Header</h1></body></html>';
 const FALLBACK_PATH = '/__grader_unknown_route__';
 
 export const goodFallbackRouteUrl = 'https://good.simple-http.com';

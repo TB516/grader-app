@@ -1,4 +1,5 @@
 import { Effect } from 'effect';
+import { http, HttpResponse } from 'msw';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
 import { runGrader } from '../../../../../src/main/grading-run';
 import { jsonDefaultGrader } from '../../../../../src/main/projects/http-api-1/graders/json-default';
@@ -9,6 +10,19 @@ import { badJsonDefaultUrl, goodHttpApi1InternalErrorUrl, goodHttpApi1Url, netwo
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
+
+test.each(['*/*', 'text/html'])('Rejects a broken JSON default for Accept: %s', async (accept) => {
+  server.use(
+    http.get(`${goodHttpApi1Url}/success`, ({ request }) => {
+      if (request.headers.get('Accept') === accept) return HttpResponse.xml('<response><message>Wrong format</message></response>');
+      return undefined;
+    })
+  );
+  expect(await Effect.runPromise(runGrader(new URL(goodHttpApi1Url), jsonDefaultGrader))).toMatchObject({
+    status: 'fail',
+    message: expect.stringContaining(accept)
+  });
+});
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;

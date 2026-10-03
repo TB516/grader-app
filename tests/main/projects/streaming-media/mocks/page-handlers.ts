@@ -7,9 +7,10 @@ export const httpErrorStreamingMediaBaseUrl = 'https://httperror.streaming-media
 export const networkErrorStreamingMediaBaseUrl = 'https://neterror.streaming-media.com';
 
 const pagePaths = ['', '/page2', '/page3'];
+const media = ['<video src="party.mp4"></video>', '<audio><source src="bling.mp3"></audio>', '<video src="bird.mp4"></video>'];
 
-export const goodPageHandlers = pagePaths.map((path) => {
-  return http.get(`${goodStreamingMediaBaseUrl}${path}`, () => HttpResponse.html('<html><body><h1>Streaming Media</h1></body></html>'));
+export const goodPageHandlers = [...pagePaths, '/__grader_unknown_route__'].map((path, index) => {
+  return http.get(`${goodStreamingMediaBaseUrl}${path}`, () => HttpResponse.html(`<html><body>${media[index % 3]}</body></html>`));
 });
 
 export const badPageHandlers = pagePaths.map((path) => {

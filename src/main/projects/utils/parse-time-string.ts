@@ -5,8 +5,8 @@ export const parseTimeString = (input: string): Temporal.PlainTime | null => {
   const result = Result.try(() => Temporal.PlainTime.from(input));
   if (Result.isSuccess(result)) return result.success;
 
+  if (!/^\d{1,2}:\d{1,2}:\d{1,2}$/u.test(input)) return null;
   const parts = input.split(':');
-  if (parts.length !== 3) return null;
 
   const [h, m, s] = parts.map(Number);
 

@@ -6,10 +6,25 @@ import { login, logout, readMaker, signup, testAccount } from '../accounts';
 import { checkJsonError, checkJsonRedirect } from '../responses';
 import { openSession, type Session } from '../session';
 
-const checkDomos = Effect.fn(function* (session: Session, present: string[], absent: string[]) {
-  const text = yield* readMaker(session);
-  for (const name of present) {
-    if (!text.includes(name)) return yield* Effect.fail<GraderResult>({ status: 'fail', message: `/maker did not display the saved Domo ${name}` });
+type Domo = { name: string; age: string };
+
+const checkDomos = Effect.fn(function* (session: Session, present: Domo[], absent: string[]) {
+  const page = yield* readMaker(session);
+  const text = page('body').text();
+  for (const domo of present) {
+    if (!text.includes(domo.name))
+      return yield* Effect.fail<GraderResult>({ status: 'fail', message: `/maker did not display the saved Domo ${domo.name}` });
+    // Find a containing element with this Domo's name and age, without assuming CSS classes.
+    const others = present.filter((other) => other !== domo);
+    const ageShown = page('body *')
+      .toArray()
+      .some((element) => {
+        const item = page(element).text();
+        if (!item.includes(domo.name) || others.some((other) => item.includes(other.name))) return false;
+        const age = /\bage\s*[:=]?\s*([+-]?\d+(?:\.\d+)?)/iu.exec(item.replaceAll(domo.name, ''));
+        return age !== null && Number(age[1]) === Number(domo.age);
+      });
+    if (!ageShown) return yield* Effect.fail<GraderResult>({ status: 'fail', message: `/maker did not display age ${domo.age} for ${domo.name}` });
   }
   for (const name of absent) {
     if (text.includes(name))
@@ -30,16 +45,21 @@ export const domosGrader: Grader = {
       const secondAccount = testAccount();
       yield* signup(first, firstAccount);
       yield* signup(second, secondAccount);
-      const names = Array.from({ length: 3 }, () => `Domo${randomUUID().slice(0, 8)}`);
-      for (const [session, name, age] of [
-        [first, names[0], '0'],
-        [first, names[1], '5'],
-        [second, names[2], '9']
-      ] as const) {
-        yield* checkJsonRedirect(yield* session.request('/maker', { name, age }), session.baseUrl, 'Create Domo');
+      const empty = (yield* readMaker(first))('body').text();
+      if (!/\b(?:no|zero|0)\s+domos?\b|\bempty\b|\b(?:first|any)\s+domo\b/iu.test(empty)) {
+        return { status: 'fail', message: '/maker did not show a message explaining that the new account has no Domos' };
       }
-      yield* checkDomos(first, names.slice(0, 2), [names[2]]);
-      yield* checkDomos(second, [names[2]], names.slice(0, 2));
+      const domos = ['0', '5', '9'].map((age) => ({ name: `Domo${randomUUID().slice(0, 8)}`, age }));
+      const names = domos.map((domo) => domo.name);
+      for (const [session, domo] of [
+        [first, domos[0]],
+        [first, domos[1]],
+        [second, domos[2]]
+      ] as const) {
+        yield* checkJsonRedirect(yield* session.request('/maker', domo), session.baseUrl, 'Create Domo');
+      }
+      yield* checkDomos(first, domos.slice(0, 2), [names[2]]);
+      yield* checkDomos(second, [domos[2]], names.slice(0, 2));
 
       const invalidName = `Invalid${randomUUID().slice(0, 8)}`;
       for (const [step, fields] of [
@@ -50,18 +70,19 @@ export const domosGrader: Grader = {
         ['Negative age', { name: invalidName, age: '-1' }],
         ['Non-numeric age', { name: invalidName, age: 'not-a-number' }]
       ] satisfies [string, Record<string, string>][]) {
-        const before = yield* readMaker(first);
+        const before = (yield* readMaker(first))('body').text();
         yield* checkJsonError(yield* first.request('/maker', fields), `Create Domo: ${step}`);
-        if ((yield* readMaker(first)) !== before) return { status: 'fail', message: `${step}: an invalid request changed the Domo list` };
+        if ((yield* readMaker(first))('body').text() !== before)
+          return { status: 'fail', message: `${step}: an invalid request changed the Domo list` };
       }
 
       yield* logout(first);
       yield* login(first, firstAccount);
-      yield* checkDomos(first, names.slice(0, 2), [names[2], invalidName]);
-      yield* checkDomos(second, [names[2]], names.slice(0, 2));
+      yield* checkDomos(first, domos.slice(0, 2), [names[2], invalidName]);
+      yield* checkDomos(second, [domos[2]], names.slice(0, 2));
       yield* logout(second);
       yield* login(second, secondAccount);
-      yield* checkDomos(second, [names[2]], names.slice(0, 2));
+      yield* checkDomos(second, [domos[2]], names.slice(0, 2));
       yield* logout(first);
       yield* logout(second);
       return {

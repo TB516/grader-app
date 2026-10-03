@@ -42,7 +42,14 @@ const rangeResponse = (body: Uint8Array, contentType: string, overrides: Record<
 };
 
 export const goodMediaHandlers = endpoints.map((endpoint) => {
-  return http.get(`${goodStreamingMediaUrl}${endpoint.path}`, () => rangeResponse(endpoint.body, endpoint.contentType));
+  const file = new Uint8Array(100);
+  file.set(endpoint.body);
+  return http.get(`${goodStreamingMediaUrl}${endpoint.path}`, ({ request }) => {
+    const [startText, endText] = (request.headers.get('Range') ?? 'bytes=0-').slice('bytes='.length).split('-');
+    const start = Number(startText);
+    const end = endText ? Number(endText) : file.length - 1;
+    return rangeResponse(file.slice(start, end + 1), endpoint.contentType, { 'Content-Range': `bytes ${start}-${end}/${file.length}` });
+  });
 });
 
 export const http200MediaHandlers = endpoints.map((endpoint) => {

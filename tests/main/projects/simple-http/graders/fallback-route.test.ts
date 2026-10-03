@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
 import { runGrader } from '../../../../../src/main/grading-run';
-import { fallbackRouteGrader } from '../../../../../src/main/projects/simple-http/graders/fallback-route';
+import { fallbackRouteGrader } from '../../../../../src/main/projects/utils/fallback-route';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
 import {

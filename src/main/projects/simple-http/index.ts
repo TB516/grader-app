@@ -1,6 +1,6 @@
 import type { Grader } from '../../types';
+import { fallbackRouteGrader } from '../utils/fallback-route';
 import { dankmemesImageGrader } from './graders/dankmemes-image';
-import { fallbackRouteGrader } from './graders/fallback-route';
 import { helloJsonGrader } from './graders/hello-json';
 import { helloTextGrader } from './graders/hello-text';
 import { indexPageGrader } from './graders/index-page';

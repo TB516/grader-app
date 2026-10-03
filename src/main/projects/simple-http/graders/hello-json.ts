@@ -23,7 +23,7 @@ export const helloJsonGrader: Grader = {
 
       const json = yield* responseJson(response, 'JSON parsing failed');
 
-      if (Result.isFailure(Schema.decodeUnknownResult(helloSchema)(json, { onExcessProperty: 'error' }))) {
+      if (Result.isFailure(Schema.decodeUnknownResult(helloSchema)(json))) {
         return {
           status: 'fail',
           message: `JSON was not {"message":"${EXPECTED_MESSAGE}"}`,

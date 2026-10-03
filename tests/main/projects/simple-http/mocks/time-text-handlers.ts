@@ -1,5 +1,4 @@
 import { http, HttpResponse } from 'msw';
-import { WIGGLE_ROOM } from '../../../../../src/main/projects/simple-http/graders/time-text';
 
 const getTime = (d: Date) => {
   return `${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}`;
@@ -28,7 +27,7 @@ export const badContentTypeTimeTexHandler = http.get(`${badContentTypeTimeTextBa
 export const badTimeTextBaseUrl = 'https://bad.simple-http.com';
 export const badTimeTextHandler = http.get(`${badTimeTextBaseUrl}/time`, () => {
   const date = new Date();
-  date.setSeconds(date.getSeconds() + WIGGLE_ROOM * 2);
+  date.setSeconds(date.getSeconds() + 120);
   return HttpResponse.text(getTime(date));
 });
 

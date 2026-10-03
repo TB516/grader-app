@@ -1,10 +1,28 @@
 import { createServer } from 'node:http';
 import { Effect } from 'effect';
 import { expect, test } from 'vitest';
-import { gradingRun } from '../../../../src/main/grading-run';
+import { gradingRun, runGrader } from '../../../../src/main/grading-run';
 import { jsonDefaultGrader } from '../../../../src/main/projects/http-api-1/graders/json-default';
+import { helloJsonGrader } from '../../../../src/main/projects/simple-http/graders/hello-json';
 import { indexPageGrader } from '../../../../src/main/projects/simple-http/graders/index-page';
 import type { GradingEvent } from '../../../../src/shared/types';
+
+test('A dropped JSON connection is an execution error, not malformed assignment JSON', async () => {
+  const server = createServer((_request, response) => {
+    response.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': '100' });
+    response.write('{');
+    setImmediate(() => response.destroy());
+  });
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const address = server.address();
+    if (!address || typeof address === 'string') throw new Error('Missing test server address');
+    expect(await Effect.runPromise(runGrader(new URL(`http://127.0.0.1:${address.port}`), helloJsonGrader))).toMatchObject({ status: 'error' });
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
 
 test.each([
   ['fetch body', indexPageGrader, 'text/html'],

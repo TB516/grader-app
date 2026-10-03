@@ -16,6 +16,7 @@ export function submission(
     exposeAllDomos?: boolean;
     dontSaveDomos?: boolean;
     relativeRedirects?: boolean;
+    renderDomos?: (domos: Account['domos']) => string;
   } = {}
 ) {
   const url = options.url ?? baseUrl;
@@ -72,7 +73,7 @@ export function submission(
         if (options.exposeAllDomos) domos = [...accounts.values()].flatMap((account) => account.domos);
         return HttpResponse.html(
           form('maker', { name: 'text', age: 'text' }) +
-            `<section>${domos.map((domo) => `<article>Name: ${domo.name} Age: ${domo.age}</article>`).join('') || '<p>No Domos yet!</p>'}</section>`
+            `<section>${options.renderDomos?.(domos) ?? (domos.map((domo) => `<article>Name: ${domo.name} Age: ${domo.age}</article>`).join('') || '<p>No Domos yet!</p>')}</section>`
         );
       }
       if (path === 'logout') {

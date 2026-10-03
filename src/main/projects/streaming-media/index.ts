@@ -1,4 +1,5 @@
 import type { Grader } from '../../types';
+import { fallbackRouteGrader } from '../utils/fallback-route';
 import { birdVideoGrader } from './graders/bird-video';
 import { blingAudioGrader } from './graders/bling-audio';
 import { indexPageGrader } from './graders/index-page';
@@ -13,5 +14,6 @@ export const streamingMediaGraders = {
   'page-3': page3Grader,
   'party-video': partyVideoGrader,
   'bling-audio': blingAudioGrader,
-  'bird-video': birdVideoGrader
+  'bird-video': birdVideoGrader,
+  'fallback-route': fallbackRouteGrader
 } satisfies Record<string, Grader>;

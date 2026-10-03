@@ -13,6 +13,43 @@ beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
+test('Requires an empty-list message for a new account', async () => {
+  server.use(submission({ renderDomos: () => '' }).handler);
+  expect(await Effect.runPromise(runGrader(new URL(baseUrl), domomakerCGraders.domos))).toMatchObject({
+    status: 'fail',
+    message: expect.stringContaining('has no Domos')
+  });
+});
+
+test.each(['missing', 'incorrect', 'swapped'])('Rejects %s displayed Domo ages', async (mode) => {
+  server.use(
+    submission({
+      renderDomos: (domos) =>
+        domos
+          .map((domo, index) => {
+            let age = `Age: ${domo.age + 1}`;
+            if (mode === 'missing') age = '';
+            if (mode === 'swapped') age = `Age: ${domos[(index + 1) % domos.length].age}`;
+            return `<article><h3>Name: ${domo.name}</h3><h3>${age}</h3></article>`;
+          })
+          .join('') || '<p>No Domos yet!</p>'
+    }).handler
+  );
+  expect(await Effect.runPromise(runGrader(new URL(baseUrl), domomakerCGraders.domos))).toMatchObject({
+    status: 'fail',
+    message: expect.stringContaining('display age')
+  });
+});
+
+test('Does not assume that a form with no action submits to the expected login route', async () => {
+  server.use(submission().handler);
+  server.use(http.get(baseUrl, () => HttpResponse.html('<form method="POST"><input name="username"><input name="pass" type="password"></form>')));
+  expect(await Effect.runPromise(runGrader(new URL(baseUrl), domomakerCGraders['public-access']))).toMatchObject({
+    status: 'fail',
+    message: expect.stringContaining('POST form')
+  });
+});
+
 test('Domomaker C runs through the registry with isolated sessions and deployment subpaths', async () => {
   const fixture = submission();
   server.use(fixture.handler);

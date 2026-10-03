@@ -9,7 +9,7 @@ import { simpleModelsGraders } from './projects/simple-models';
 import { streamingMediaGraders } from './projects/streaming-media';
 import type { Grader } from './types';
 
-const gradersByProject: Record<ProjectTypes, Record<string, Grader> | null> = {
+const gradersByProject: Record<ProjectTypes, Record<string, Grader>> = {
   'Simple HTTP': simpleHttpGraders,
   'Streaming Media': streamingMediaGraders,
   'HTTP API I': httpApi1Graders,
@@ -18,8 +18,8 @@ const gradersByProject: Record<ProjectTypes, Record<string, Grader> | null> = {
   'Domomaker C': domomakerCGraders
 };
 
-/** Only implemented assignments can start a run. Renderer availability comes from this registry. */
-export const availableProjects = (): ProjectTypes[] => projects.filter((project) => gradersByProject[project] !== null);
+/** The registry implements every assignment in the shared display order. */
+export const availableProjects = (): ProjectTypes[] => [...projects];
 
 const projectRequest = Schema.Struct({
   assignment: Schema.Literals(projects),
@@ -32,6 +32,5 @@ export const projectRouter = Effect.fn(function* (input: unknown) {
     Effect.mapError(() => new Error('Choose an assignment and enter a valid HTTP or HTTPS URL.'))
   );
   const graders = gradersByProject[assignment];
-  if (!graders) return yield* Effect.fail(new Error(`${assignment} does not have a grader yet.`));
   return { assignment, url, graders };
 });

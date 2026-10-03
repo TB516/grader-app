@@ -85,6 +85,8 @@
           <p class="hint">These tests create dogs and update their ages. Test records remain in the database.</p>
         {:else if selectedProjectType === 'Domomaker C'}
           <p class="hint">These tests create accounts and Domos. Test records remain in the database.</p>
+        {:else if selectedProjectType === 'HTTP API II'}
+          <p class="hint">These tests create a user and update their age. The test user remains in the app.</p>
         {:else}
           <p class="hint">Enter a reachable deployment URL. Results open in a separate grading window.</p>
         {/if}

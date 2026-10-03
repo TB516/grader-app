@@ -82,7 +82,9 @@ export const readFormPage = Effect.fn(function* (response: Response, baseUrl: UR
   for (const element of page('form').toArray()) {
     const form = page(element);
     if (form.attr('method')?.toUpperCase() !== 'POST') continue;
-    const action = yield* redirectUrl(form.attr('action') || path, projectUrl(baseUrl, path));
+    const pageUrl = new URL(response.url || projectUrl(baseUrl, path));
+    const documentBase = yield* redirectUrl(page('base[href]').first().attr('href') || pageUrl.href, pageUrl);
+    const action = yield* redirectUrl(form.attr('action') || pageUrl.href, documentBase);
     if (action.href !== projectUrl(baseUrl, path).href) continue;
     if (
       Object.entries(fields).every(([name, types]) => {
@@ -101,5 +103,5 @@ export const readFormPage = Effect.fn(function* (response: Response, baseUrl: UR
     return yield* Effect.fail<GraderResult>({ status: 'fail', message: `${path}: missing POST form with ${Object.keys(fields).join(', ')} inputs` });
   }
   page('script, style, form, nav').remove();
-  return page('body').text().replace(/\s+/gu, ' ').trim();
+  return page;
 });

@@ -1,5 +1,4 @@
 import { http, HttpResponse } from 'msw';
-import { WIGGLE_ROOM } from '../../../../../src/main/projects/simple-http/graders/time-text';
 
 const getTime = (d: Date) => {
   return `${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}`;
@@ -13,7 +12,7 @@ export const goodTimeJsonHandler = http.get(`${goodTimeJsonUrl}/timeJSON`, () =>
 export const badTimeJsonUrl = 'https://bad.simple-http.com';
 export const badTimeJsonHandler = http.get(`${badTimeJsonUrl}/timeJSON`, () => {
   const date = new Date();
-  date.setSeconds(date.getSeconds() + WIGGLE_ROOM * 2);
+  date.setSeconds(date.getSeconds() + 120);
   return HttpResponse.json({ time: getTime(date) });
 });
 
