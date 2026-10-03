@@ -1,4 +1,6 @@
+import { Effect } from 'effect';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { page2Grader } from '../../../../../src/main/projects/simple-http/graders/page-2';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -10,28 +12,28 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await page2Grader.run(new URL(goodPage2BaseUrl));
+  const result = await Effect.runPromise(runGrader(new URL(goodPage2BaseUrl), page2Grader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await page2Grader.run(new URL(badPage2BaseUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badPage2BaseUrl), page2Grader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await page2Grader.run(new URL(httpErrorPage2BaseUrl));
+  const result = await Effect.runPromise(runGrader(new URL(httpErrorPage2BaseUrl), page2Grader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await page2Grader.run(new URL(networkErrorPage2BaseUrl));
+  const result = await Effect.runPromise(runGrader(new URL(networkErrorPage2BaseUrl), page2Grader));
 
   expect(result).toMatchObject(expected);
 });

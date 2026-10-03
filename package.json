@@ -25,10 +25,9 @@
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
     "@xmldom/xmldom": "^0.9.12",
+    "effect": "4.0.0",
     "electron-updater": "^6.8.3",
-    "temporal-polyfill": "^0.3.2",
-    "try": "^1.0.3",
-    "zod": "^4.6.5"
+    "temporal-polyfill": "^0.3.2"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",

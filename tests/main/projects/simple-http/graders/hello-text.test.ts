@@ -1,4 +1,6 @@
+import { Effect } from 'effect';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { helloTextGrader } from '../../../../../src/main/projects/simple-http/graders/hello-text';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -16,35 +18,35 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(new URL(goodHelloTextUrl));
+  const result = await Effect.runPromise(runGrader(new URL(goodHelloTextUrl), helloTextGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(new URL(badHelloTextUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badHelloTextUrl), helloTextGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'text/plain'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(new URL(badContentTypeHelloTextUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badContentTypeHelloTextUrl), helloTextGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(new URL(httpErrorHelloTextUrl));
+  const result = await Effect.runPromise(runGrader(new URL(httpErrorHelloTextUrl), helloTextGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await helloTextGrader.run(new URL(networkErrorHelloTextUrl));
+  const result = await Effect.runPromise(runGrader(new URL(networkErrorHelloTextUrl), helloTextGrader));
 
   expect(result).toMatchObject(expected);
 });

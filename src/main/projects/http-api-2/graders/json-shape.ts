@@ -1,29 +1,23 @@
-import { t } from 'try';
-import { z } from 'zod';
+import { Effect, Schema } from 'effect';
 import type { GraderResult } from '../../../../shared/types';
-import { responseDetails } from '../../utils/details';
 
-export type JsonParseResult = { ok: true; value: unknown } | { ok: false; result: GraderResult };
+export const messageSchema = Schema.Struct({ message: Schema.Trim.check(Schema.isNonEmpty()) });
+export const errorSchema = Schema.Struct({ ...messageSchema.fields, id: Schema.Trim.check(Schema.isNonEmpty()) });
 
-export const messageSchema = z.object({ message: z.string().trim().min(1) });
-export const errorSchema = messageSchema.extend({ id: z.string().trim().min(1) });
-
-const userSchema = z.object({
-  name: z.string().optional(),
-  age: z.union([z.number(), z.string().trim().min(1)]).pipe(z.coerce.number())
+const userSchema = Schema.Struct({
+  name: Schema.optional(Schema.String),
+  age: Schema.Union([Schema.Finite, Schema.Trim.check(Schema.isNonEmpty()).pipe(Schema.decodeTo(Schema.FiniteFromString))])
 });
-const userCollectionSchema = z.union([
-  z.record(z.string(), userSchema).transform((users) => Object.entries(users).map(([name, user]) => ({ ...user, name: user.name ?? name }))),
-  z.array(userSchema.extend({ name: z.string() }))
+const userCollectionSchema = Schema.Union([
+  Schema.Record(Schema.String, userSchema),
+  Schema.Array(Schema.Struct({ ...userSchema.fields, name: Schema.String }))
 ]);
 
-// The PDF explicitly permits different user collection structures.
-export const usersSchema = z.union([z.object({ users: userCollectionSchema }).transform((body) => body.users), userCollectionSchema]);
-
-export const parseJsonResponse = async (response: Response, failureMessage: string): Promise<JsonParseResult> => {
-  const json = await t(async () => await response.json());
-  if (!json.ok) {
-    return { ok: false, result: { status: 'fail', message: failureMessage, details: responseDetails(response) } };
-  }
-  return { ok: true, value: json.value };
-};
+/** The PDF permits keyed records or arrays, with or without a users wrapper. */
+export const parseUsers = (input: unknown, message: string) =>
+  Schema.decodeUnknownEffect(Schema.Struct({ users: userCollectionSchema }))(input).pipe(
+    Effect.map((body) => body.users),
+    Effect.catch(() => Schema.decodeUnknownEffect(userCollectionSchema)(input)),
+    Effect.map((users) => Object.entries(users).map(([name, user]) => ({ ...user, name: user.name ?? name }))),
+    Effect.mapError((): GraderResult => ({ status: 'fail', message, details: JSON.stringify(input) }))
+  );

@@ -1,5 +1,7 @@
+import { Effect } from 'effect';
 import { http, HttpResponse } from 'msw';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { getUsersGetGrader } from '../../../../../src/main/projects/http-api-2/graders/get-users-get';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -21,35 +23,35 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await getUsersGetGrader.run(new URL(goodHttpApi2Url));
+  const result = await Effect.runPromise(runGrader(new URL(goodHttpApi2Url), getUsersGetGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if JSON body is not a users object', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await getUsersGetGrader.run(new URL(badGetUsersGetUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badGetUsersGetUrl), getUsersGetGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails invalid JSON', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await getUsersGetGrader.run(new URL(invalidJsonGetUsersGetUrl));
+  const result = await Effect.runPromise(runGrader(new URL(invalidJsonGetUsersGetUrl), getUsersGetGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad content type', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await getUsersGetGrader.run(new URL(badContentTypeGetUsersGetUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badContentTypeGetUsersGetUrl), getUsersGetGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await getUsersGetGrader.run(new URL(httpErrorGetUsersGetUrl));
+  const result = await Effect.runPromise(runGrader(new URL(httpErrorGetUsersGetUrl), getUsersGetGrader));
 
   expect(result).toMatchObject(expected);
 });
@@ -61,13 +63,13 @@ test.each([
   { users: [{ name: 'Alice', age: '21' }] }
 ])('Grader accepts alternative user collections allowed by the PDF: %j', async (body) => {
   server.use(http.get(`${goodHttpApi2Url}/getUsers`, () => HttpResponse.json(body)));
-  expect((await getUsersGetGrader.run(new URL(goodHttpApi2Url))).status).toBe('pass');
+  expect((await Effect.runPromise(runGrader(new URL(goodHttpApi2Url), getUsersGetGrader))).status).toBe('pass');
 });
 
 test.each([{ message: 'Not a user list' }, { users: null }, { users: { Alice: { name: 'Alice' } } }])(
   'Grader rejects a response without usable user data: %j',
   async (body) => {
     server.use(http.get(`${goodHttpApi2Url}/getUsers`, () => HttpResponse.json(body)));
-    expect((await getUsersGetGrader.run(new URL(goodHttpApi2Url))).status).toBe('fail');
+    expect((await Effect.runPromise(runGrader(new URL(goodHttpApi2Url), getUsersGetGrader))).status).toBe('fail');
   }
 );

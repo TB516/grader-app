@@ -1,53 +1,22 @@
-import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
-import { simpleHttpRunner } from '../../../../src/main/projects/simple-http';
+import { Effect } from 'effect';
+import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { gradingRun } from '../../../../src/main/grading-run';
+import { projectRouter } from '../../../../src/main/project-router';
+import type { GradingEvent } from '../../../../src/shared/types';
 import { server } from './mocks';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-test('Runner returns the full grader list and streams results', async () => {
-  const send = vi.fn();
-  const done = vi.fn();
+test('Simple HTTP runs its checks through the application registry', async () => {
+  const events: GradingEvent[] = [];
+  const { graders, url } = Effect.runSync(projectRouter({ assignment: 'Simple HTTP', url: 'https://good.simple-http.com/' }));
+  await Effect.runPromise(gradingRun('test-run', url, graders, (event) => events.push(event)));
 
-  const runs = simpleHttpRunner(new URL('https://good.simple-http.com'), send, done);
-
-  expect(runs).toEqual([
-    { label: 'Index Page Returns HTML', result: null },
-    { label: 'Page 2 Returns HTML', result: null },
-    { label: 'Hello Endpoint Returns "Hello World"', result: null },
-    { label: 'Time Endpoint Returns Correct Time', result: null },
-    { label: 'Hello JSON Endpoint Returns {"message":"Hello World"}', result: null },
-    { label: 'Time JSON Endpoint Returns Correct Time', result: null },
-    { label: 'Dankmemes Endpoint Returns PNG', result: null },
-    { label: 'Unknown Routes Match Index Page', result: null }
-  ]);
-
-  await vi.waitFor(() => {
-    expect(send).toHaveBeenCalledTimes(8);
-    expect(done).toHaveBeenCalledTimes(1);
-  });
-
-  for (const call of send.mock.calls) {
-    expect(call[0]).toMatchObject({
-      label: expect.any(String),
-      result: { status: expect.stringMatching(/pass|fail|error/), message: expect.any(String) }
-    });
-  }
-});
-
-test('Runner accepts project URLs with a trailing slash', async () => {
-  const send = vi.fn();
-  const done = vi.fn();
-
-  simpleHttpRunner(new URL('https://good.simple-http.com/'), send, done);
-
-  await vi.waitFor(() => {
-    expect(send).toHaveBeenCalledTimes(8);
-    expect(done).toHaveBeenCalledTimes(1);
-  });
-
-  for (const call of send.mock.calls) {
-    expect(call[0].result.status).toBe('pass');
-  }
+  expect(events[0].type).toBe('started');
+  const results = events.filter((event) => event.type === 'result');
+  expect(results).toHaveLength(Object.keys(graders).length);
+  expect(results.every((event) => event.check.result?.status === 'pass')).toBe(true);
+  expect(events.at(-1)).toEqual({ runId: 'test-run', type: 'finished', outcome: 'completed' });
 });

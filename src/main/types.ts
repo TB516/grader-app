@@ -1,10 +1,8 @@
-import type { GraderResult, GraderRun } from '../shared/types';
-
-export type StreamRunnerResultFunction = (run: GraderRun) => void;
-
-export type StreamingDoneFunction = VoidFunction;
+import type { Effect, Scope } from 'effect';
+import type { GraderResult } from '../shared/types';
 
 export type Grader = {
   label: string;
-  run: (url: URL) => Promise<GraderResult>;
+  /** The runner scopes requests and converts expected failures into reported results. */
+  run: (url: URL) => Effect.Effect<GraderResult, GraderResult, Scope.Scope>;
 };

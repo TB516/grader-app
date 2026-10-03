@@ -1,10 +1,11 @@
-import { t } from 'try';
+import { Effect } from 'effect';
 import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
-import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { projectUrl } from '../../utils/project-url';
 import { rangeResponseCheck } from '../../utils/range-response-check';
+import { request } from '../../utils/request';
+import { responseBytes } from '../../utils/response-body';
 
 type SignatureCheck = (buffer: Uint8Array) => boolean;
 
@@ -29,55 +30,54 @@ export const mediaRangeGrader = ({
   signatureCheck
 }: MediaRangeGraderOptions): Grader => ({
   label,
-  run: async (url) => {
-    const response = await t(fetch, projectUrl(url, path), {
-      headers: {
-        Range: `bytes=${rangeStart}-${rangeEnd}`
+  run: (url) =>
+    Effect.gen(function* () {
+      const response = yield* request(projectUrl(url, path), {
+        headers: {
+          Range: `bytes=${rangeStart}-${rangeEnd}`
+        }
+      });
+
+      let failure = httpStatusCheck(response, 206);
+      if (failure) return failure;
+
+      failure = rangeResponseCheck(response, { start: rangeStart, end: rangeEnd });
+      if (failure) return failure;
+
+      failure = contentTypeCheck(response, expectedContentType);
+      if (failure) return failure;
+
+      const buffer = yield* responseBytes(response, 'Media parsing failed');
+      if (buffer.length === 0) return { status: 'fail', message: 'Media body was empty', details: JSON.stringify(response) };
+
+      const contentLength = response.headers.get('Content-Length');
+      const parsedContentLength = contentLength ? Number.parseInt(contentLength, 10) : Number.NaN;
+      if (!Number.isFinite(parsedContentLength) || parsedContentLength <= 0) {
+        return {
+          status: 'fail',
+          message: 'Content-Length header was not a positive number',
+          details: contentLength ?? ''
+        };
       }
-    });
-    if (!response.ok) return fetchErrorResult(response.error);
 
-    let failure = httpStatusCheck(response.value, 206);
-    if (failure) return failure;
+      if (parsedContentLength !== buffer.length) {
+        return {
+          status: 'fail',
+          message: 'Content-Length header did not match the returned byte count',
+          details: JSON.stringify({ contentLength: parsedContentLength, byteCount: buffer.length })
+        };
+      }
 
-    failure = rangeResponseCheck(response.value, { start: rangeStart, end: rangeEnd });
-    if (failure) return failure;
+      if (!signatureCheck(buffer)) {
+        return {
+          status: 'fail',
+          message: signatureFailureMessage,
+          details: JSON.stringify([...buffer.slice(0, rangeEnd + 1)])
+        };
+      }
 
-    failure = contentTypeCheck(response.value, expectedContentType);
-    if (failure) return failure;
-
-    const buffer = await t(async () => new Uint8Array(await response.value.arrayBuffer()));
-    if (!buffer.ok) return { status: 'error', message: 'Media parsing failed', details: JSON.stringify(buffer.error) };
-    if (buffer.value.length === 0) return { status: 'fail', message: 'Media body was empty', details: JSON.stringify(response.value) };
-
-    const contentLength = response.value.headers.get('Content-Length');
-    const parsedContentLength = contentLength ? Number.parseInt(contentLength, 10) : Number.NaN;
-    if (!Number.isFinite(parsedContentLength) || parsedContentLength <= 0) {
-      return {
-        status: 'fail',
-        message: 'Content-Length header was not a positive number',
-        details: contentLength ?? ''
-      };
-    }
-
-    if (parsedContentLength !== buffer.value.length) {
-      return {
-        status: 'fail',
-        message: 'Content-Length header did not match the returned byte count',
-        details: JSON.stringify({ contentLength: parsedContentLength, byteCount: buffer.value.length })
-      };
-    }
-
-    if (!signatureCheck(buffer.value)) {
-      return {
-        status: 'fail',
-        message: signatureFailureMessage,
-        details: JSON.stringify([...buffer.value.slice(0, rangeEnd + 1)])
-      };
-    }
-
-    return { status: 'pass', message: passMessage, details: JSON.stringify(response.value) };
-  }
+      return { status: 'pass', message: passMessage, details: JSON.stringify(response) };
+    })
 });
 
 export const mp4SignatureCheck = (buffer: Uint8Array): boolean => {

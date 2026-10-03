@@ -1,40 +1,40 @@
-import { t } from 'try';
+import { Effect, Result, Schema } from 'effect';
 import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
-import { responseDetails } from '../../utils/details';
-import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { projectUrl } from '../../utils/project-url';
+import { request } from '../../utils/request';
+import { responseJson } from '../../utils/response-body';
 
 const EXPECTED_MESSAGE = 'Hello World';
+const helloSchema = Schema.Struct({ message: Schema.Literal(EXPECTED_MESSAGE) });
 
 export const helloJsonGrader: Grader = {
   label: 'Hello JSON Endpoint Returns {"message":"Hello World"}',
-  run: async (url) => {
-    const response = await t(fetch, projectUrl(url, '/helloJSON'));
-    if (!response.ok) return fetchErrorResult(response.error);
+  run: (url) =>
+    Effect.gen(function* () {
+      const response = yield* request(projectUrl(url, '/helloJSON'));
 
-    let failure = httpStatusCheck(response.value, 200);
-    if (failure) return failure;
+      let failure = httpStatusCheck(response, 200);
+      if (failure) return failure;
 
-    failure = contentTypeCheck(response.value, 'application/json');
-    if (failure) return failure;
+      failure = contentTypeCheck(response, 'application/json');
+      if (failure) return failure;
 
-    const json = await t(async () => await response.value.json());
-    if (!json.ok) return { status: 'fail', message: 'JSON parsing failed', details: responseDetails(response.value) };
+      const json = yield* responseJson(response, 'JSON parsing failed');
 
-    if (typeof json.value !== 'object' || json.value === null || json.value.message !== EXPECTED_MESSAGE || Object.keys(json.value).length !== 1) {
+      if (Result.isFailure(Schema.decodeUnknownResult(helloSchema)(json, { onExcessProperty: 'error' }))) {
+        return {
+          status: 'fail',
+          message: `JSON was not {"message":"${EXPECTED_MESSAGE}"}`,
+          details: JSON.stringify(json)
+        };
+      }
+
       return {
-        status: 'fail',
-        message: `JSON was not {"message":"${EXPECTED_MESSAGE}"}`,
-        details: JSON.stringify(json.value)
+        status: 'pass',
+        message: `JSON was {"message":"${EXPECTED_MESSAGE}"}`,
+        details: JSON.stringify(json)
       };
-    }
-
-    return {
-      status: 'pass',
-      message: `JSON was {"message":"${EXPECTED_MESSAGE}"}`,
-      details: JSON.stringify(json.value)
-    };
-  }
+    })
 };

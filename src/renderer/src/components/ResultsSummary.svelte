@@ -5,7 +5,8 @@
     passed,
     failed,
     errors,
-    pending
+    pending,
+    cancelled
   }: {
     total: number;
     complete: number;
@@ -13,6 +14,7 @@
     failed: number;
     errors: number;
     pending: number;
+    cancelled: number;
   } = $props();
 </script>
 
@@ -41,12 +43,15 @@
     <span>Pending</span>
     <strong>{pending}</strong>
   </div>
+  {#if cancelled > 0}
+    <div><span>Cancelled</span><strong>{cancelled}</strong></div>
+  {/if}
 </section>
 
 <style>
   .summary {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
     gap: 10px;
     position: sticky;
     top: 0;

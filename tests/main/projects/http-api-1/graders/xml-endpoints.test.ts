@@ -1,5 +1,7 @@
+import { Effect } from 'effect';
 import { http, HttpResponse } from 'msw';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { xmlEndpointsGrader } from '../../../../../src/main/projects/http-api-1/graders/xml-endpoints';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -19,49 +21,49 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await xmlEndpointsGrader.run(new URL(goodHttpApi1Url));
+  const result = await Effect.runPromise(runGrader(new URL(goodHttpApi1Url), xmlEndpointsGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader passes when /internal uses internalError id variant', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await xmlEndpointsGrader.run(new URL(goodHttpApi1InternalErrorUrl));
+  const result = await Effect.runPromise(runGrader(new URL(goodHttpApi1InternalErrorUrl), xmlEndpointsGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if a status is wrong', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await xmlEndpointsGrader.run(new URL(badXmlStatusUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badXmlStatusUrl), xmlEndpointsGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'text/xml' or 'application/xml'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await xmlEndpointsGrader.run(new URL(badXmlContentTypeUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badXmlContentTypeUrl), xmlEndpointsGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if XML message is missing', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await xmlEndpointsGrader.run(new URL(missingXmlMessageUrl));
+  const result = await Effect.runPromise(runGrader(new URL(missingXmlMessageUrl), xmlEndpointsGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if XML error id is wrong', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await xmlEndpointsGrader.run(new URL(wrongXmlIdUrl));
+  const result = await Effect.runPromise(runGrader(new URL(wrongXmlIdUrl), xmlEndpointsGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await xmlEndpointsGrader.run(new URL(networkErrorApiUrl));
+  const result = await Effect.runPromise(runGrader(new URL(networkErrorApiUrl), xmlEndpointsGrader));
 
   expect(result).toMatchObject(expected);
 });
@@ -74,7 +76,10 @@ test.each([
   '<response><MESSAGE>ok</MESSAGE></response>'
 ])('Grader rejects invalid XML or missing message content: %s', async (body) => {
   server.use(http.get(`${goodHttpApi1Url}/success`, () => new HttpResponse(body, { headers: { 'Content-Type': 'text/xml' } })));
-  expect((await xmlEndpointsGrader.run(new URL(goodHttpApi1Url))).status).toBe('fail');
+  expect(await Effect.runPromise(runGrader(new URL(goodHttpApi1Url), xmlEndpointsGrader))).toMatchObject({
+    status: 'fail',
+    message: expect.stringContaining('/success:')
+  });
 });
 
 test('Grader accepts XML entities and CDATA in a valid response', async () => {
@@ -89,5 +94,5 @@ test('Grader accepts XML entities and CDATA in a valid response', async () => {
       );
     })
   );
-  expect((await xmlEndpointsGrader.run(new URL(goodHttpApi1Url))).status).toBe('pass');
+  expect((await Effect.runPromise(runGrader(new URL(goodHttpApi1Url), xmlEndpointsGrader))).status).toBe('pass');
 });

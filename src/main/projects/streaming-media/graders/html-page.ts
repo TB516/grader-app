@@ -1,9 +1,10 @@
-import { t } from 'try';
+import { Effect } from 'effect';
 import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
-import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { projectUrl } from '../../utils/project-url';
+import { request } from '../../utils/request';
+import { responseText } from '../../utils/response-body';
 
 type HtmlPageGraderOptions = {
   label: string;
@@ -13,20 +14,19 @@ type HtmlPageGraderOptions = {
 
 export const htmlPageGrader = ({ label, path, passMessage }: HtmlPageGraderOptions): Grader => ({
   label,
-  run: async (url) => {
-    const response = await t(fetch, projectUrl(url, path));
-    if (!response.ok) return fetchErrorResult(response.error);
+  run: (url) =>
+    Effect.gen(function* () {
+      const response = yield* request(projectUrl(url, path));
 
-    let failure = httpStatusCheck(response.value, 200);
-    if (failure) return failure;
+      let failure = httpStatusCheck(response, 200);
+      if (failure) return failure;
 
-    failure = contentTypeCheck(response.value, 'text/html');
-    if (failure) return failure;
+      failure = contentTypeCheck(response, 'text/html');
+      if (failure) return failure;
 
-    const text = await t(async () => await response.value.text());
-    if (!text.ok) return { status: 'error', message: 'Text parsing failed', details: JSON.stringify(text.error) };
-    if (!text.value.trim()) return { status: 'fail', message: 'HTML body was empty', details: JSON.stringify(response.value) };
+      const text = yield* responseText(response, 'Text parsing failed');
+      if (!text.trim()) return { status: 'fail', message: 'HTML body was empty', details: JSON.stringify(response) };
 
-    return { status: 'pass', message: passMessage, details: JSON.stringify(response.value) };
-  }
+      return { status: 'pass', message: passMessage, details: JSON.stringify(response) };
+    })
 });

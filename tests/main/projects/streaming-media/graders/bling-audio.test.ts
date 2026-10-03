@@ -1,4 +1,6 @@
+import { Effect } from 'effect';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { blingAudioGrader } from '../../../../../src/main/projects/streaming-media/graders/bling-audio';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -20,63 +22,63 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(goodStreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(goodStreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the endpoint returns 200 instead of 206', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(http200StreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(http200StreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the content type is not audio/mpeg', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(badContentTypeStreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badContentTypeStreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if Accept-Ranges is not bytes', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(badAcceptRangesStreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badAcceptRangesStreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if Content-Range is malformed', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(badContentRangeStreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badContentRangeStreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the media body is empty', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(emptyMediaStreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(emptyMediaStreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if the media signature is not MP3', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(badSignatureStreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badSignatureStreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 206 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(httpErrorMediaStreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(httpErrorMediaStreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await blingAudioGrader.run(new URL(networkErrorMediaStreamingMediaUrl));
+  const result = await Effect.runPromise(runGrader(new URL(networkErrorMediaStreamingMediaUrl), blingAudioGrader));
 
   expect(result).toMatchObject(expected);
 });

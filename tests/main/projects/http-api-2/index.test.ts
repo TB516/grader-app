@@ -1,6 +1,8 @@
-import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
-import { httpApi2Runner } from '../../../../src/main/projects/http-api-2';
-import { indexPageGrader } from '../../../../src/main/projects/http-api-2/graders/index-page';
+import { Effect } from 'effect';
+import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { gradingRun } from '../../../../src/main/grading-run';
+import { projectRouter } from '../../../../src/main/project-router';
+import type { GradingEvent } from '../../../../src/shared/types';
 import { server } from './mocks';
 import { goodHttpApi2Url, resetGoodHttpApi2Users } from './mocks/http-api-2-handlers';
 
@@ -11,65 +13,14 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-test('Runner returns the full grader list and streams results', async () => {
-  const send = vi.fn();
-  const done = vi.fn();
+test('HTTP API II runs its checks through the application registry', async () => {
+  const events: GradingEvent[] = [];
+  const { graders, url } = Effect.runSync(projectRouter({ assignment: 'HTTP API II', url: goodHttpApi2Url }));
+  await Effect.runPromise(gradingRun('test-run', url, graders, (event) => events.push(event)));
 
-  const runs = httpApi2Runner(new URL(goodHttpApi2Url), send, done);
-
-  expect(runs).toEqual([
-    { label: 'Home Page Returns HTML', result: null },
-    { label: 'Style CSS Returns text/css', result: null },
-    { label: '/getUsers GET Returns Users JSON', result: null },
-    { label: '/getUsers HEAD Returns 200 Without Body', result: null },
-    { label: '/notReal GET Returns JSON 404', result: null },
-    { label: '/notReal HEAD Returns 404 Without Body', result: null },
-    { label: 'Unknown Routes Return 404', result: null },
-    { label: '/addUser POST Creates Updates And Validates Users', result: null }
-  ]);
-
-  await vi.waitFor(() => {
-    expect(send).toHaveBeenCalledTimes(8);
-    expect(done).toHaveBeenCalledTimes(1);
-  });
-
-  for (const call of send.mock.calls) {
-    expect(call[0]).toMatchObject({
-      label: expect.any(String),
-      result: { status: expect.stringMatching(/pass|fail|error/), message: expect.any(String) }
-    });
-  }
-});
-
-test('Runner accepts project URLs with a trailing slash', async () => {
-  const send = vi.fn();
-  const done = vi.fn();
-
-  httpApi2Runner(new URL(`${goodHttpApi2Url}/`), send, done);
-
-  await vi.waitFor(() => {
-    expect(send).toHaveBeenCalledTimes(8);
-    expect(done).toHaveBeenCalledTimes(1);
-  });
-
-  for (const call of send.mock.calls) {
-    expect(call[0].result.status).toBe('pass');
-  }
-});
-
-test('Runner reports an unexpected grader exception and still completes', async () => {
-  const send = vi.fn();
-  const done = vi.fn();
-  const spy = vi.spyOn(indexPageGrader, 'run').mockRejectedValueOnce(new Error('Unexpected failure'));
-  try {
-    const pending = httpApi2Runner(new URL(goodHttpApi2Url), send, done);
-    await vi.waitFor(() => expect(done).toHaveBeenCalledOnce());
-    expect(send).toHaveBeenCalledTimes(pending.length);
-    expect(send).toHaveBeenCalledWith({
-      label: indexPageGrader.label,
-      result: { status: 'error', message: expect.any(String), details: expect.stringContaining('Unexpected failure') }
-    });
-  } finally {
-    spy.mockRestore();
-  }
+  expect(events[0].type).toBe('started');
+  const results = events.filter((event) => event.type === 'result');
+  expect(results).toHaveLength(Object.keys(graders).length);
+  expect(results.every((event) => event.check.result?.status === 'pass')).toBe(true);
+  expect(events.at(-1)).toEqual({ runId: 'test-run', type: 'finished', outcome: 'completed' });
 });

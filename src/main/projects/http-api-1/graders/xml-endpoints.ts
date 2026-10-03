@@ -1,19 +1,19 @@
-import { t } from 'try';
+import { Effect } from 'effect';
 import type { Grader } from '../../../types';
-import { fetchErrorResult } from '../../utils/fetch-error-result';
 import { apiExpectations, checkXmlResponse, fetchWithAccept } from './response-shape';
 
 export const xmlEndpointsGrader: Grader = {
   label: 'API Returns XML For text/xml Accept Header',
-  run: async (url) => {
-    for (const expectation of apiExpectations) {
-      const response = await t(async () => await fetchWithAccept(url, expectation.path, 'text/xml'));
-      if (!response.ok) return fetchErrorResult(response.error);
+  run: (url) =>
+    Effect.gen(function* () {
+      for (const expectation of apiExpectations) {
+        const response = yield* fetchWithAccept(url, expectation.path, 'text/xml');
 
-      const failure = await checkXmlResponse(response.value, expectation);
-      if (failure) return { ...failure, message: `${expectation.path}: ${failure.message}` };
-    }
+        yield* checkXmlResponse(response, expectation).pipe(
+          Effect.mapError((failure) => ({ ...failure, message: `${expectation.path}: ${failure.message}` }))
+        );
+      }
 
-    return { status: 'pass', message: 'API returned XML for every endpoint with text/xml Accept header' };
-  }
+      return { status: 'pass', message: 'API returned XML for every endpoint with text/xml Accept header' };
+    })
 };

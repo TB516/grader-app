@@ -1,4 +1,6 @@
+import { Effect } from 'effect';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { fallbackRouteGrader } from '../../../../../src/main/projects/simple-http/graders/fallback-route';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -16,35 +18,35 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(new URL(goodFallbackRouteUrl));
+  const result = await Effect.runPromise(runGrader(new URL(goodFallbackRouteUrl), fallbackRouteGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails bad assignment', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(new URL(badFallbackRouteUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badFallbackRouteUrl), fallbackRouteGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'text/html'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(new URL(badContentTypeFallbackRouteUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badContentTypeFallbackRouteUrl), fallbackRouteGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(new URL(httpErrorFallbackRouteUrl));
+  const result = await Effect.runPromise(runGrader(new URL(httpErrorFallbackRouteUrl), fallbackRouteGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await fallbackRouteGrader.run(new URL(networkErrorFallbackRouteUrl));
+  const result = await Effect.runPromise(runGrader(new URL(networkErrorFallbackRouteUrl), fallbackRouteGrader));
 
   expect(result).toMatchObject(expected);
 });

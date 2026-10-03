@@ -1,9 +1,9 @@
+import { Result } from 'effect';
 import { Temporal } from 'temporal-polyfill';
-import { t } from 'try';
 
 export const parseTimeString = (input: string): Temporal.PlainTime | null => {
-  const [ok, , result] = t(Temporal.PlainTime.from, input);
-  if (ok) return result;
+  const result = Result.try(() => Temporal.PlainTime.from(input));
+  if (Result.isSuccess(result)) return result.success;
 
   const parts = input.split(':');
   if (parts.length !== 3) return null;

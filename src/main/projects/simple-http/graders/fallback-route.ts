@@ -1,30 +1,30 @@
-import { t } from 'try';
+import { Effect } from 'effect';
 import type { Grader } from '../../../types';
 import { contentTypeCheck } from '../../utils/content-type-check';
-import { errorDetails, responseDetails } from '../../utils/details';
-import { fetchErrorResult } from '../../utils/fetch-error-result';
+import { responseDetails } from '../../utils/details';
 import { httpStatusCheck } from '../../utils/http-status-check';
 import { projectUrl } from '../../utils/project-url';
+import { request } from '../../utils/request';
+import { responseText } from '../../utils/response-body';
 
 const UNKNOWN_ROUTE = '/__grader_unknown_route__';
 
 export const fallbackRouteGrader: Grader = {
   label: 'Unknown Routes Match Index Page',
-  run: async (url) => {
-    const response = await t(fetch, projectUrl(url, UNKNOWN_ROUTE));
-    if (!response.ok) return fetchErrorResult(response.error);
+  run: (url) =>
+    Effect.gen(function* () {
+      const response = yield* request(projectUrl(url, UNKNOWN_ROUTE));
 
-    let failure = httpStatusCheck(response.value, 200);
-    if (failure) return failure;
+      let failure = httpStatusCheck(response, 200);
+      if (failure) return failure;
 
-    failure = contentTypeCheck(response.value, 'text/html');
-    if (failure) return failure;
+      failure = contentTypeCheck(response, 'text/html');
+      if (failure) return failure;
 
-    const text = await t(async () => await response.value.text());
-    if (!text.ok) return { status: 'error', message: 'Fallback text parsing failed', details: errorDetails(text.error) };
+      const text = yield* responseText(response, 'Fallback text parsing failed');
 
-    if (!text.value.trim()) return { status: 'fail', message: 'HTML body was empty', details: responseDetails(response.value) };
+      if (!text.trim()) return { status: 'fail', message: 'HTML body was empty', details: responseDetails(response) };
 
-    return { status: 'pass', message: 'Unknown route returned HTML', details: responseDetails(response.value) };
-  }
+      return { status: 'pass', message: 'Unknown route returned HTML', details: responseDetails(response) };
+    })
 };

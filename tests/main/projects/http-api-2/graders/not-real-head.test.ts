@@ -1,5 +1,7 @@
+import { Effect } from 'effect';
 import { http, HttpResponse } from 'msw';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { notRealHeadGrader } from '../../../../../src/main/projects/http-api-2/graders/not-real-head';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -11,26 +13,26 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await notRealHeadGrader.run(new URL(goodHttpApi2Url));
+  const result = await Effect.runPromise(runGrader(new URL(goodHttpApi2Url), notRealHeadGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 404 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await notRealHeadGrader.run(new URL(badNotRealHeadStatusUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badNotRealHeadStatusUrl), notRealHeadGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a present non JSON content type', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await notRealHeadGrader.run(new URL(badNotRealHeadContentTypeUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badNotRealHeadContentTypeUrl), notRealHeadGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader rejects a HEAD response missing its JSON Content-Type', async () => {
   server.use(http.head(`${goodHttpApi2Url}/notReal`, () => new HttpResponse(null, { status: 404 })));
-  expect((await notRealHeadGrader.run(new URL(goodHttpApi2Url))).status).toBe('fail');
+  expect((await Effect.runPromise(runGrader(new URL(goodHttpApi2Url), notRealHeadGrader))).status).toBe('fail');
 });

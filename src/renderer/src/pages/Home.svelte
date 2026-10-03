@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import { fly } from 'svelte/transition';
   import { projects } from '../../../shared/projects';
@@ -6,7 +7,25 @@
 
   let selectedProjectType = $state<ProjectTypes>('Simple HTTP');
   let titleDirection = $state(1);
-  let projectUrl = '';
+  let projectUrl = $state('');
+  let availableProjects = $state<ProjectTypes[]>([]);
+  let loading = $state(true);
+  let errorMessage = $state('');
+  const canRun = $derived(availableProjects.includes(selectedProjectType));
+
+  onMount(() => {
+    void window.api
+      .availableProjects()
+      .then((projects) => {
+        availableProjects = projects;
+      })
+      .catch(() => {
+        errorMessage = 'Unable to load available graders.';
+      })
+      .finally(() => {
+        loading = false;
+      });
+  });
 
   const selectProject = (project: ProjectTypes): void => {
     if (project === selectedProjectType) return;
@@ -17,8 +36,15 @@
     selectedProjectType = project;
   };
 
-  const handleSubmit = (): void => {
-    window.api.launchTester(selectedProjectType, projectUrl);
+  const handleSubmit = async (event: SubmitEvent): Promise<void> => {
+    event.preventDefault();
+    if (!canRun) return;
+    errorMessage = '';
+    try {
+      await window.api.launchTester(selectedProjectType, projectUrl);
+    } catch (error) {
+      errorMessage = error instanceof Error ? error.message : 'Unable to open a grading window.';
+    }
   };
 </script>
 
@@ -57,10 +83,18 @@
       <label for="project-url">Project URL</label>
       <div class="url-row">
         <input id="project-url" type="url" required placeholder="https://example.com" bind:value={projectUrl} />
-        <button type="submit">Run Tests</button>
+        <button type="submit" disabled={!canRun}>Run Tests</button>
       </div>
 
-      <p class="hint">Enter a reachable deployment URL. Results open in a separate grading window.</p>
+      {#if errorMessage}
+        <p class="hint" role="alert">{errorMessage}</p>
+      {:else if loading}
+        <p class="hint">Loading graders…</p>
+      {:else if !canRun}
+        <p class="hint">The grader for this assignment is not available yet.</p>
+      {:else}
+        <p class="hint">Enter a reachable deployment URL. Results open in a separate grading window.</p>
+      {/if}
     </form>
   </section>
 </main>
@@ -232,7 +266,12 @@
       transform 160ms ease;
   }
 
-  form button:hover {
+  form button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  form button:hover:not(:disabled) {
     background: #d5ff91;
     transform: translateY(-1px);
   }

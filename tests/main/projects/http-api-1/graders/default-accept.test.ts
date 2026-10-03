@@ -1,5 +1,7 @@
 import { createServer } from 'node:http';
+import { Effect } from 'effect';
 import { expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { jsonDefaultGrader } from '../../../../../src/main/projects/http-api-1/graders/json-default';
 
 test('Default-format grading sends no Accept header over HTTP', async () => {
@@ -27,7 +29,7 @@ test('Default-format grading sends no Accept header over HTTP', async () => {
   try {
     const address = server.address();
     if (!address || typeof address === 'string') throw new Error('Missing test server address');
-    const result = await jsonDefaultGrader.run(new URL(`http://127.0.0.1:${address.port}`));
+    const result = await Effect.runPromise(runGrader(new URL(`http://127.0.0.1:${address.port}`), jsonDefaultGrader));
     expect(result.status).toBe('pass');
     expect(acceptHeaders.length).toBeGreaterThan(0);
     expect(acceptHeaders.every((header) => header === undefined)).toBe(true);

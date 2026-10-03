@@ -1,63 +1,24 @@
-import { beforeEach, expect, test, vi } from 'vitest';
-import { projectRouter } from '../../src/main/project-router';
-import { httpApi1Runner } from '../../src/main/projects/http-api-1';
-import { httpApi2Runner } from '../../src/main/projects/http-api-2';
-import { simpleHttpRunner } from '../../src/main/projects/simple-http';
-import { streamingMediaRunner } from '../../src/main/projects/streaming-media';
-import { projects } from '../../src/shared/projects';
+import { Effect } from 'effect';
+import { expect, test } from 'vitest';
+import { availableProjects, projectRouter } from '../../src/main/project-router';
 
-vi.mock('../../src/main/projects/http-api-1', () => ({ httpApi1Runner: vi.fn(() => []) }));
-vi.mock('../../src/main/projects/http-api-2', () => ({ httpApi2Runner: vi.fn(() => []) }));
-
-vi.mock('../../src/main/projects/simple-http', () => ({
-  simpleHttpRunner: vi.fn(() => [])
-}));
-
-vi.mock('../../src/main/projects/streaming-media', () => ({
-  streamingMediaRunner: vi.fn(() => [])
-}));
-
-beforeEach(() => {
-  vi.clearAllMocks();
+test('Only implemented projects are available; unsupported projects cannot run another assignment', () => {
+  expect(availableProjects()).toEqual(['Simple HTTP', 'Streaming Media', 'HTTP API I', 'HTTP API II']);
+  for (const assignment of ['Simple Models', 'Domomaker C']) {
+    expect(() => Effect.runSync(projectRouter({ assignment, url: 'https://example.com/' }))).toThrow('does not have a grader yet');
+  }
 });
 
-const event = {
-  sender: {
-    send: vi.fn()
-  }
-} as unknown as Electron.IpcMainInvokeEvent;
-
-test.each(projects.filter((project) => !['Streaming Media', 'HTTP API I', 'HTTP API II'].includes(project)))(
-  'Router passes the project URL through for %s',
-  (assignment) => {
-    projectRouter(event, assignment, 'https://good.simple-http.com/');
-
-    const url = vi.mocked(simpleHttpRunner).mock.calls[0][0];
-
-    expect(url).toBeInstanceOf(URL);
-    expect(url.toString()).toBe('https://good.simple-http.com/');
-    expect(simpleHttpRunner).toHaveBeenCalledWith(url, expect.any(Function), expect.any(Function));
-    expect(streamingMediaRunner).not.toHaveBeenCalled();
+test.each(['file:///tmp/submission', 'javascript:alert(1)', 'ftp://example.com', 'not a URL', null])(
+  'Rejects invalid project URL %s before running checks',
+  (url) => {
+    expect(() => Effect.runSync(projectRouter({ assignment: 'Simple HTTP', url }))).toThrow();
   }
 );
 
-test('Router sends Streaming Media to the streaming media runner', () => {
-  projectRouter(event, 'Streaming Media', 'https://good.streaming-media.com/');
-
-  const url = vi.mocked(streamingMediaRunner).mock.calls[0][0];
-
-  expect(url).toBeInstanceOf(URL);
-  expect(url.toString()).toBe('https://good.streaming-media.com/');
-  expect(streamingMediaRunner).toHaveBeenCalledWith(url, expect.any(Function), expect.any(Function));
-  expect(simpleHttpRunner).not.toHaveBeenCalled();
-});
-
-test.each([
-  ['HTTP API I', httpApi1Runner],
-  ['HTTP API II', httpApi2Runner]
-] as const)('Router selects the correct runner for %s', (assignment, runner) => {
-  projectRouter(event, assignment, 'https://assignment.example/course/');
-  expect(runner).toHaveBeenCalledWith(new URL('https://assignment.example/course/'), expect.any(Function), expect.any(Function));
-  expect(simpleHttpRunner).not.toHaveBeenCalled();
-  expect(streamingMediaRunner).not.toHaveBeenCalled();
+test('Preserves deployment subpaths and rejects unknown assignments', () => {
+  expect(Effect.runSync(projectRouter({ assignment: 'HTTP API II', url: 'https://example.com/course/' })).url.href).toBe(
+    'https://example.com/course/'
+  );
+  expect(() => Effect.runSync(projectRouter({ assignment: 'unknown', url: 'https://example.com' }))).toThrow();
 });

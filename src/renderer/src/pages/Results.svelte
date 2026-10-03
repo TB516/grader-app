@@ -1,71 +1,45 @@
 <script lang="ts">
   import { searchParams } from 'sv-router';
   import { onMount } from 'svelte';
-  import type { GraderRun, ProjectTypes } from '../../../shared/types';
+  import type { GraderRun, GraderResult } from '../../../shared/types';
   import GraderResultRow from '../components/GraderResultRow.svelte';
   import ResultsSummary from '../components/ResultsSummary.svelte';
 
-  type PageStatus = 'starting' | 'running' | 'done' | 'error';
+  type PageStatus = 'starting' | 'running' | 'completed' | 'cancelled' | 'error';
 
-  const projectUrl = searchParams.get('url') as string;
-  const projectType = searchParams.get('assignment') as ProjectTypes;
-
-  let pageStatus = $state<PageStatus>(projectUrl ? 'starting' : 'error');
-  let errorMessage = $state(projectUrl ? '' : 'Missing project URL.');
+  const projectUrl = searchParams.get('url');
+  const projectType = searchParams.get('assignment');
+  const runId = crypto.randomUUID();
+  let pageStatus = $state<PageStatus>('starting');
+  let errorMessage = $state('');
   let graders = $state<GraderRun[]>([]);
 
-  const completedCount = (): number => graders.filter((run) => run.result !== null).length;
-  const statusCount = (status: 'pass' | 'fail' | 'error'): number => graders.filter((run) => run.result?.status === status).length;
+  const completedCount = (): number => graders.filter((run) => run.result !== null && run.result.status !== 'cancelled').length;
+  const statusCount = (status: GraderResult['status']): number => graders.filter((run) => run.result?.status === status).length;
   const pendingCount = (): number => graders.filter((run) => run.result === null).length;
 
-  const mergeGraderRun = (incomingRun: GraderRun): void => {
-    const existingIndex = graders.findIndex((run) => run.label === incomingRun.label);
-
-    if (existingIndex === -1) {
-      graders = [...graders, incomingRun];
-      return;
-    }
-
-    graders = graders.map((run, index) => (index === existingIndex ? { ...run, ...incomingRun } : run));
-  };
-
-  const mergeInitialGraderRuns = (initialRuns: GraderRun[]): void => {
-    const streamedRuns = new Map(graders.map((run) => [run.label, run]));
-    const mergedRuns = initialRuns.map((run) => streamedRuns.get(run.label) ?? run);
-    const extraStreamedRuns = graders.filter((run) => !initialRuns.some((initialRun) => initialRun.label === run.label));
-
-    graders = [...mergedRuns, ...extraStreamedRuns];
-  };
-
   onMount(() => {
-    if (!projectUrl) {
+    if (!projectUrl || !projectType) {
+      pageStatus = 'error';
+      errorMessage = 'Missing assignment or project URL.';
       return;
     }
 
-    const unsubscribeFromGraderUpdate = window.api.subscribeToGraderUpdate((run) => {
-      mergeGraderRun(run);
-    });
-    const unsubscribeFromGraderDone = window.api.subscribeToGraderDone(() => {
-      pageStatus = 'done';
-      unsubscribeFromGraderUpdate();
-    });
-
-    const startGrading = async (): Promise<void> => {
-      try {
-        pageStatus = 'running';
-        mergeInitialGraderRuns(await window.api.testProject(projectType, projectUrl));
-      } catch (error) {
-        pageStatus = 'error';
-        errorMessage = error instanceof Error ? error.message : 'Unable to start grading.';
+    return window.api.gradeProject({ runId, assignment: projectType, url: projectUrl }, (event) => {
+      switch (event.type) {
+        case 'started':
+          graders = event.checks;
+          pageStatus = 'running';
+          break;
+        case 'result':
+          graders = graders.map((check) => (check.id === event.check.id ? event.check : check));
+          break;
+        case 'finished':
+          pageStatus = event.outcome;
+          errorMessage = event.message ?? '';
+          break;
       }
-    };
-
-    void startGrading();
-
-    return () => {
-      unsubscribeFromGraderUpdate();
-      unsubscribeFromGraderDone();
-    };
+    });
   });
 </script>
 
@@ -78,10 +52,13 @@
     <div>
       <p>{projectType ?? 'Project'}</p>
       {#if projectUrl}
-        <a href={projectUrl}>{projectUrl}</a>
+        <a href={projectUrl} target="_blank" rel="noreferrer">{projectUrl}</a>
       {/if}
     </div>
-    {#if pageStatus !== 'done'}
+    {#if pageStatus === 'running'}
+      <button type="button" onclick={() => window.api.cancelGrading(runId)}>Cancel</button>
+    {/if}
+    {#if pageStatus !== 'completed'}
       <span class:running={pageStatus === 'running'} class:error={pageStatus === 'error'}>{pageStatus}</span>
     {/if}
   </header>
@@ -99,6 +76,7 @@
       failed={statusCount('fail')}
       errors={statusCount('error')}
       pending={pendingCount()}
+      cancelled={statusCount('cancelled')}
     />
 
     {#if graders.length === 0}
@@ -108,7 +86,7 @@
       </section>
     {:else}
       <ol class="graders" aria-label="Graders">
-        {#each graders as grader (grader.label)}
+        {#each graders as grader (grader.id)}
           <GraderResultRow {grader} />
         {/each}
       </ol>
@@ -186,6 +164,15 @@
   .topbar > span.error {
     color: #180b0b;
     background: #ef4444;
+  }
+
+  .topbar button {
+    border: 1px solid #69716d;
+    border-radius: 6px;
+    padding: 8px 14px;
+    color: #f3f4ef;
+    background: #111417;
+    cursor: pointer;
   }
 
   .notice {

@@ -1,5 +1,7 @@
+import { Effect } from 'effect';
 import { http, HttpResponse } from 'msw';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { addUserGrader } from '../../../../../src/main/projects/http-api-2/graders/add-user';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -21,35 +23,35 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await addUserGrader.run(new URL(goodHttpApi2Url));
+  const result = await Effect.runPromise(runGrader(new URL(goodHttpApi2Url), addUserGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails when create returns the wrong status', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await addUserGrader.run(new URL(badAddUserCreateStatusUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badAddUserCreateStatusUrl), addUserGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails when create does not persist the user', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await addUserGrader.run(new URL(badAddUserNoPersistUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badAddUserNoPersistUrl), addUserGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails when update returns the wrong status', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await addUserGrader.run(new URL(badAddUserUpdateStatusUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badAddUserUpdateStatusUrl), addUserGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails when update does not change the stored age', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await addUserGrader.run(new URL(badAddUserNoUpdateUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badAddUserNoUpdateUrl), addUserGrader));
 
   expect(result).toMatchObject(expected);
 });
@@ -69,7 +71,7 @@ test('Grader supports query-string POSTs and array user collections', async () =
     }),
     http.get(`${goodHttpApi2Url}/getUsers`, () => HttpResponse.json({ users: [...users.values()] }))
   );
-  const result = await addUserGrader.run(new URL(goodHttpApi2Url));
+  const result = await Effect.runPromise(runGrader(new URL(goodHttpApi2Url), addUserGrader));
   expect(result).toMatchObject({ status: 'pass', message: expect.stringContaining('query') });
   expect([...users.values()]).toEqual([{ name: expect.any(String), age: 22 }]);
 });
@@ -85,11 +87,14 @@ test.each(['name', 'age'])('Grader catches acceptance of a missing %s independen
       return undefined;
     })
   );
-  const result = await addUserGrader.run(new URL(goodHttpApi2Url));
+  const result = await Effect.runPromise(runGrader(new URL(goodHttpApi2Url), addUserGrader));
   expect(result).toMatchObject({ status: 'fail', message: expect.stringContaining(`Missing ${field}:`) });
 });
 
 test('Concurrent runs use independent test users', async () => {
-  const results = await Promise.all([addUserGrader.run(new URL(goodHttpApi2Url)), addUserGrader.run(new URL(goodHttpApi2Url))]);
+  const results = await Promise.all([
+    Effect.runPromise(runGrader(new URL(goodHttpApi2Url), addUserGrader)),
+    Effect.runPromise(runGrader(new URL(goodHttpApi2Url), addUserGrader))
+  ]);
   expect(results.map((result) => result.status)).toEqual(['pass', 'pass']);
 });

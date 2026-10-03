@@ -1,29 +1,24 @@
-/// Bridge file that exposes the IPC emitter wrappers to the renderer through the window API
-/// Functions can be exported directly and will be auto wrapped by the contextBridge
+/// The renderer sees typed data and operations, never Electron or the Effect runtime.
 import { ipcRenderer } from 'electron';
-import type { GraderRun, ProjectTypes } from '../shared/types';
+import type { GradingEvent, GradingRequest, ProjectTypes } from '../shared/types';
 
-const launchTester = (assignment: ProjectTypes, url: string) => ipcRenderer.send('launchTestWindow', assignment, url);
+const availableProjects = (): Promise<ProjectTypes[]> => ipcRenderer.invoke('availableProjects');
 
-const testProject = (assignment: ProjectTypes, url: string) => ipcRenderer.invoke('testProject', assignment, url);
+const launchTester = (assignment: ProjectTypes, url: string): Promise<void> => ipcRenderer.invoke('launchTestWindow', { assignment, url });
 
-const subscribeToGraderUpdate = (callback: (run: GraderRun) => void): VoidFunction => {
-  const listener = (_event: Electron.IpcRendererEvent, run: GraderRun) => callback(run);
+const cancelGrading = (runId: string): void => ipcRenderer.send('grader:cancel', runId);
 
-  ipcRenderer.on('grader:run', listener);
-
-  return () => ipcRenderer.removeListener('grader:run', listener);
-};
-
-const subscribeToGraderDone = (callback: VoidFunction): VoidFunction => {
-  const listener = () => {
-    callback();
-    ipcRenderer.removeListener('grader:done', listener);
+/** Subscribe before starting; all events for this run arrive on the same channel. Cleanup cancels the run. */
+const gradeProject = (request: GradingRequest, callback: (event: GradingEvent) => void): VoidFunction => {
+  const listener = (_event: Electron.IpcRendererEvent, event: GradingEvent): void => {
+    if (event.runId === request.runId) callback(event);
   };
-
-  ipcRenderer.on('grader:done', listener);
-
-  return () => ipcRenderer.removeListener('grader:done', listener);
+  ipcRenderer.on('grader:event', listener);
+  ipcRenderer.send('grader:start', request);
+  return () => {
+    ipcRenderer.removeListener('grader:event', listener);
+    cancelGrading(request.runId);
+  };
 };
 
-export { launchTester, subscribeToGraderDone, subscribeToGraderUpdate, testProject };
+export { availableProjects, launchTester, gradeProject, cancelGrading };

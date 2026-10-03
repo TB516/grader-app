@@ -1,5 +1,6 @@
 <script module lang="ts">
-  export type StatusBadgeStatus = 'pass' | 'fail' | 'error' | 'pending';
+  import type { GraderResult } from '../../../shared/types';
+  export type StatusBadgeStatus = GraderResult['status'] | 'pending';
 </script>
 
 <script lang="ts">
@@ -37,7 +38,8 @@
     background: #facc15;
   }
 
-  .pending {
+  .pending,
+  .cancelled {
     color: #e5e7eb;
     background: #374151;
   }

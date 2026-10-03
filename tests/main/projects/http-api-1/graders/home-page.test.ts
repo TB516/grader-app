@@ -1,4 +1,6 @@
+import { Effect } from 'effect';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { runGrader } from '../../../../../src/main/grading-run';
 import { homePageGrader } from '../../../../../src/main/projects/http-api-1/graders/home-page';
 import type { GraderResult } from '../../../../../src/shared/types';
 import { server } from '../mocks';
@@ -16,35 +18,35 @@ afterAll(() => server.close());
 
 test('Grader passes good assignment', async () => {
   const expected = { status: 'pass', message: expect.any(String) } satisfies GraderResult;
-  const result = await homePageGrader.run(new URL(goodHttpApi1Url));
+  const result = await Effect.runPromise(runGrader(new URL(goodHttpApi1Url), homePageGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails if HTML body is empty', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await homePageGrader.run(new URL(emptyHomePageUrl));
+  const result = await Effect.runPromise(runGrader(new URL(emptyHomePageUrl), homePageGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test("Grader fails if the content type is not 'text/html'", async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await homePageGrader.run(new URL(badHomePageContentTypeUrl));
+  const result = await Effect.runPromise(runGrader(new URL(badHomePageContentTypeUrl), homePageGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader fails a non 200 response', async () => {
   const expected = { status: 'fail', message: expect.any(String) } satisfies GraderResult;
-  const result = await homePageGrader.run(new URL(httpErrorHomePageUrl));
+  const result = await Effect.runPromise(runGrader(new URL(httpErrorHomePageUrl), homePageGrader));
 
   expect(result).toMatchObject(expected);
 });
 
 test('Grader errors on network error', async () => {
   const expected = { status: 'error', message: expect.any(String) } satisfies GraderResult;
-  const result = await homePageGrader.run(new URL(networkErrorHomePageUrl));
+  const result = await Effect.runPromise(runGrader(new URL(networkErrorHomePageUrl), homePageGrader));
 
   expect(result).toMatchObject(expected);
 });

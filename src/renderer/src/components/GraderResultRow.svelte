@@ -53,7 +53,8 @@
     padding-left: 16px;
   }
 
-  .pending {
+  .pending,
+  .cancelled {
     border-left: 3px solid #6b7280;
     padding-left: 16px;
   }
