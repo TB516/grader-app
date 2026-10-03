@@ -83,6 +83,8 @@
           <p class="hint">The grader for this assignment is not available yet.</p>
         {:else if selectedProjectType === 'Simple Models'}
           <p class="hint">These tests create dogs and update their ages. Test records remain in the database.</p>
+        {:else if selectedProjectType === 'Domomaker C'}
+          <p class="hint">These tests create accounts and Domos. Test records remain in the database.</p>
         {:else}
           <p class="hint">Enter a reachable deployment URL. Results open in a separate grading window.</p>
         {/if}

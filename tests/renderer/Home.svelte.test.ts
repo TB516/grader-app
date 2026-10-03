@@ -3,7 +3,7 @@ import { cleanup, render } from 'vitest-browser-svelte/pure';
 import Home from '../../src/renderer/src/pages/Home.svelte';
 import type { ProjectTypes } from '../../src/shared/types';
 
-const available: ProjectTypes[] = ['Simple HTTP', 'Streaming Media', 'HTTP API I', 'HTTP API II', 'Simple Models'];
+const available: ProjectTypes[] = ['Simple HTTP', 'Streaming Media', 'HTTP API I', 'HTTP API II', 'Simple Models', 'Domomaker C'];
 
 beforeEach(() => {
   vi.stubGlobal('api', {
@@ -18,7 +18,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test('Shows loading until assignments arrive, then disables unsupported assignments without refetching', async () => {
+test('Shows loading until assignments arrive, then enables assignments without refetching', async () => {
   const loading = Promise.withResolvers<ProjectTypes[]>();
   vi.mocked(window.api.availableProjects).mockReturnValueOnce(loading.promise);
   const screen = await render(Home);
@@ -27,8 +27,8 @@ test('Shows loading until assignments arrive, then disables unsupported assignme
   const submit = screen.getByRole('button', { name: 'Run Tests' });
   await expect.element(submit).toBeEnabled();
   await screen.getByRole('button', { name: 'Domomaker C' }).click();
-  await expect.element(submit).toBeDisabled();
-  await expect.element(screen.getByText('The grader for this assignment is not available yet.')).toBeVisible();
+  await expect.element(submit).toBeEnabled();
+  await expect.element(screen.getByText('These tests create accounts and Domos.', { exact: false })).toBeVisible();
   await screen.getByRole('button', { name: 'Simple Models' }).click();
   await expect.element(submit).toBeEnabled();
   await expect.element(screen.getByText('Test records remain in the database.', { exact: false })).toBeVisible();

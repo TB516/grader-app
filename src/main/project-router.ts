@@ -1,6 +1,7 @@
 import { Effect, Schema } from 'effect';
 import { projects } from '../shared/projects';
 import type { ProjectTypes } from '../shared/types';
+import { domomakerCGraders } from './projects/domomaker-c';
 import { httpApi1Graders } from './projects/http-api-1';
 import { httpApi2Graders } from './projects/http-api-2';
 import { simpleHttpGraders } from './projects/simple-http';
@@ -14,7 +15,7 @@ const gradersByProject: Record<ProjectTypes, Record<string, Grader> | null> = {
   'HTTP API I': httpApi1Graders,
   'HTTP API II': httpApi2Graders,
   'Simple Models': simpleModelsGraders,
-  'Domomaker C': null
+  'Domomaker C': domomakerCGraders
 };
 
 /** Only implemented assignments can start a run. Renderer availability comes from this registry. */
