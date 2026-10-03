@@ -3,7 +3,7 @@ import { cleanup, render } from 'vitest-browser-svelte/pure';
 import Home from '../../src/renderer/src/pages/Home.svelte';
 import type { ProjectTypes } from '../../src/shared/types';
 
-const available: ProjectTypes[] = ['Simple HTTP', 'Streaming Media', 'HTTP API I', 'HTTP API II'];
+const available: ProjectTypes[] = ['Simple HTTP', 'Streaming Media', 'HTTP API I', 'HTTP API II', 'Simple Models'];
 
 beforeEach(() => {
   vi.stubGlobal('api', {
@@ -26,11 +26,12 @@ test('Shows loading until assignments arrive, then disables unsupported assignme
   loading.resolve(available);
   const submit = screen.getByRole('button', { name: 'Run Tests' });
   await expect.element(submit).toBeEnabled();
-  await screen.getByRole('button', { name: 'Simple Models' }).click();
+  await screen.getByRole('button', { name: 'Domomaker C' }).click();
   await expect.element(submit).toBeDisabled();
   await expect.element(screen.getByText('The grader for this assignment is not available yet.')).toBeVisible();
-  await screen.getByRole('button', { name: 'HTTP API II' }).click();
+  await screen.getByRole('button', { name: 'Simple Models' }).click();
   await expect.element(submit).toBeEnabled();
+  await expect.element(screen.getByText('Test records remain in the database.', { exact: false })).toBeVisible();
   expect(window.api.availableProjects).toHaveBeenCalledOnce();
 });
 

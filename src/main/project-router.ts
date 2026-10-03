@@ -4,6 +4,7 @@ import type { ProjectTypes } from '../shared/types';
 import { httpApi1Graders } from './projects/http-api-1';
 import { httpApi2Graders } from './projects/http-api-2';
 import { simpleHttpGraders } from './projects/simple-http';
+import { simpleModelsGraders } from './projects/simple-models';
 import { streamingMediaGraders } from './projects/streaming-media';
 import type { Grader } from './types';
 
@@ -12,7 +13,7 @@ const gradersByProject: Record<ProjectTypes, Record<string, Grader> | null> = {
   'Streaming Media': streamingMediaGraders,
   'HTTP API I': httpApi1Graders,
   'HTTP API II': httpApi2Graders,
-  'Simple Models': null,
+  'Simple Models': simpleModelsGraders,
   'Domomaker C': null
 };
 

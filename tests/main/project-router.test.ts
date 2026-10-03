@@ -3,10 +3,8 @@ import { expect, test } from 'vitest';
 import { availableProjects, projectRouter } from '../../src/main/project-router';
 
 test('Only implemented projects are available; unsupported projects cannot run another assignment', () => {
-  expect(availableProjects()).toEqual(['Simple HTTP', 'Streaming Media', 'HTTP API I', 'HTTP API II']);
-  for (const assignment of ['Simple Models', 'Domomaker C']) {
-    expect(() => Effect.runSync(projectRouter({ assignment, url: 'https://example.com/' }))).toThrow('does not have a grader yet');
-  }
+  expect(availableProjects()).toEqual(['Simple HTTP', 'Streaming Media', 'HTTP API I', 'HTTP API II', 'Simple Models']);
+  expect(() => Effect.runSync(projectRouter({ assignment: 'Domomaker C', url: 'https://example.com/' }))).toThrow('does not have a grader yet');
 });
 
 test.each(['file:///tmp/submission', 'javascript:alert(1)', 'ftp://example.com', 'not a URL', null])(
