@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router } from 'sv-router';
   import './router';
-  import './reset.css';
+  import './styles.css';
 </script>
 
 <Router base="#" />

@@ -1,50 +1,41 @@
 <script lang="ts">
-  let {
-    total,
-    complete,
-    passed,
-    failed,
-    errors,
-    pending,
-    cancelled
-  }: {
-    total: number;
-    complete: number;
-    passed: number;
-    failed: number;
-    errors: number;
-    pending: number;
-    cancelled: number;
-  } = $props();
+  import type { GraderRun, GraderResult } from '../../../shared/types';
+
+  let { graders }: { graders: GraderRun[] } = $props();
+  const counts = $derived.by(() => {
+    const statuses: Record<GraderResult['status'] | 'pending', number> = { pass: 0, fail: 0, error: 0, cancelled: 0, pending: 0 };
+    for (const grader of graders) statuses[grader.result?.status ?? 'pending'] += 1;
+    return statuses;
+  });
 </script>
 
 <section class="summary" aria-label="Grading summary">
   <div>
     <span>Total</span>
-    <strong>{total}</strong>
+    <strong>{graders.length}</strong>
   </div>
   <div>
     <span>Complete</span>
-    <strong>{complete}</strong>
+    <strong>{graders.length - counts.pending - counts.cancelled}</strong>
   </div>
   <div>
     <span>Passed</span>
-    <strong>{passed}</strong>
+    <strong>{counts.pass}</strong>
   </div>
   <div>
     <span>Failed</span>
-    <strong>{failed}</strong>
+    <strong>{counts.fail}</strong>
   </div>
   <div>
     <span>Errors</span>
-    <strong>{errors}</strong>
+    <strong>{counts.error}</strong>
   </div>
   <div>
     <span>Pending</span>
-    <strong>{pending}</strong>
+    <strong>{counts.pending}</strong>
   </div>
-  {#if cancelled > 0}
-    <div><span>Cancelled</span><strong>{cancelled}</strong></div>
+  {#if counts.cancelled > 0}
+    <div><span>Cancelled</span><strong>{counts.cancelled}</strong></div>
   {/if}
 </section>
 

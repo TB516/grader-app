@@ -1,31 +1,15 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import { fly } from 'svelte/transition';
   import { projects } from '../../../shared/projects';
   import { type ProjectTypes } from '../../../shared/types';
+  import Spinner from '../components/Spinner.svelte';
 
   let selectedProjectType = $state<ProjectTypes>('Simple HTTP');
   let titleDirection = $state(1);
   let projectUrl = $state('');
-  let availableProjects = $state<ProjectTypes[]>([]);
-  let loading = $state(true);
+  let opening = $state(false);
   let errorMessage = $state('');
-  const canRun = $derived(availableProjects.includes(selectedProjectType));
-
-  onMount(() => {
-    void window.api
-      .availableProjects()
-      .then((projects) => {
-        availableProjects = projects;
-      })
-      .catch(() => {
-        errorMessage = 'Unable to load available graders.';
-      })
-      .finally(() => {
-        loading = false;
-      });
-  });
 
   const selectProject = (project: ProjectTypes): void => {
     if (project === selectedProjectType) return;
@@ -34,16 +18,20 @@
     const nextIndex = projects.indexOf(project);
     titleDirection = nextIndex > currentIndex ? 1 : -1;
     selectedProjectType = project;
+    errorMessage = '';
   };
 
-  const handleSubmit = async (event: SubmitEvent): Promise<void> => {
+  const handleSubmit = async (event: SubmitEvent, availableProjects: ProjectTypes[]): Promise<void> => {
     event.preventDefault();
-    if (!canRun) return;
+    if (!availableProjects.includes(selectedProjectType) || opening) return;
+    opening = true;
     errorMessage = '';
     try {
       await window.api.launchTester(selectedProjectType, projectUrl);
-    } catch (error) {
-      errorMessage = error instanceof Error ? error.message : 'Unable to open a grading window.';
+    } catch {
+      errorMessage = 'Unable to open the grading window. Check the project URL and try again.';
+    } finally {
+      opening = false;
     }
   };
 </script>
@@ -53,82 +41,102 @@
 </svelte:head>
 
 <main class="app-shell">
-  <section class="workspace" aria-label="Project test setup">
-    <nav aria-label="Assignments">
-      <p>Assignments</p>
-      {#each projects as project (project)}
-        <button
-          type="button"
-          class:active={project === selectedProjectType}
-          aria-pressed={project === selectedProjectType}
-          onclick={() => selectProject(project)}
-        >
-          <span>{project}</span>
-        </button>
-      {/each}
-    </nav>
-
-    <form onsubmit={handleSubmit}>
-      <div class="form-heading">
-        {#key selectedProjectType}
-          <h2
-            in:fly={{ y: titleDirection * 28, duration: 260, easing: cubicOut }}
-            out:fly={{ y: titleDirection * -28, duration: 260, easing: cubicOut }}
+  <svelte:boundary>
+    {@const availableProjects = await window.api.availableProjects()}
+    {@const canRun = availableProjects.includes(selectedProjectType)}
+    <section class="workspace" aria-label="Project test setup">
+      <nav aria-label="Assignments">
+        <p>Assignments</p>
+        {#each projects as project (project)}
+          <button
+            type="button"
+            class:active={project === selectedProjectType}
+            aria-pressed={project === selectedProjectType}
+            onclick={() => selectProject(project)}
           >
-            {selectedProjectType}
-          </h2>
-        {/key}
-      </div>
+            <span>{project}</span>
+          </button>
+        {/each}
+      </nav>
 
-      <label for="project-url">Project URL</label>
-      <div class="url-row">
-        <input id="project-url" type="url" required placeholder="https://example.com" bind:value={projectUrl} />
-        <button type="submit" disabled={!canRun}>Run Tests</button>
-      </div>
+      <form onsubmit={(event) => handleSubmit(event, availableProjects)}>
+        <div class="form-heading">
+          {#key selectedProjectType}
+            <h2
+              in:fly={{ y: titleDirection * 28, duration: 260, easing: cubicOut }}
+              out:fly={{ y: titleDirection * -28, duration: 260, easing: cubicOut }}
+            >
+              {selectedProjectType}
+            </h2>
+          {/key}
+        </div>
 
-      {#if errorMessage}
-        <p class="hint" role="alert">{errorMessage}</p>
-      {:else if loading}
-        <p class="hint">Loading graders…</p>
-      {:else if !canRun}
-        <p class="hint">The grader for this assignment is not available yet.</p>
-      {:else}
-        <p class="hint">Enter a reachable deployment URL. Results open in a separate grading window.</p>
-      {/if}
-    </form>
-  </section>
+        <label for="project-url">Project URL</label>
+        <div class="url-row">
+          <input id="project-url" type="url" required placeholder="https://example.com" bind:value={projectUrl} />
+          <button type="submit" disabled={!canRun || opening}>{opening ? 'Opening…' : 'Run Tests'}</button>
+        </div>
+
+        {#if errorMessage}
+          <p class="hint" role="alert">{errorMessage}</p>
+        {:else if !canRun}
+          <p class="hint">The grader for this assignment is not available yet.</p>
+        {:else}
+          <p class="hint">Enter a reachable deployment URL. Results open in a separate grading window.</p>
+        {/if}
+      </form>
+    </section>
+    {#snippet pending()}
+      <section class="notice" aria-label="Loading graders">
+        <Spinner ariaLabel="Loading graders" />
+        <p>Loading graders…</p>
+      </section>
+    {/snippet}
+
+    <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -- Only the boundary's retry callback is needed. -->
+    {#snippet failed(_error, reset)}
+      <section class="notice">
+        <h1>Unable to load graders</h1>
+        <p role="alert">The assignment list could not be loaded. Try again.</p>
+        <button class="retry" type="button" onclick={reset}>Try again</button>
+      </section>
+    {/snippet}
+  </svelte:boundary>
 </main>
 
 <style>
-  :global(*) {
-    box-sizing: border-box;
-  }
-
-  :global(body) {
-    min-width: 720px;
-    color: #f3f4ef;
-    background: #08090b;
-    font-family:
-      Aptos,
-      'Segoe UI Variable',
-      'Segoe UI',
-      ui-sans-serif,
-      system-ui,
-      -apple-system,
-      sans-serif;
-    font-feature-settings: 'ss01' on;
-  }
-
-  :global(button),
-  :global(input) {
-    font: inherit;
-  }
-
   .app-shell {
     width: min(1120px, calc(100vw - 56px));
     min-height: 100vh;
     margin: 0 auto;
     padding: 56px 0 48px;
+  }
+
+  .notice {
+    display: grid;
+    justify-items: start;
+    gap: 18px;
+    padding: 24px 0;
+    line-height: 1.5;
+  }
+
+  .notice h1 {
+    font-size: 1.4rem;
+    font-weight: 680;
+  }
+
+  .notice p {
+    color: #aeb8b1;
+  }
+
+  .retry {
+    border: 0;
+    border-radius: 6px;
+    padding: 12px 20px;
+    color: #111507;
+    background: #b9f56e;
+    font-weight: 800;
+    cursor: pointer;
   }
 
   nav p,
@@ -283,10 +291,6 @@
   }
 
   @media (max-width: 760px) {
-    :global(body) {
-      min-width: 0;
-    }
-
     .app-shell {
       width: min(100% - 32px, 680px);
       padding-top: 24px;

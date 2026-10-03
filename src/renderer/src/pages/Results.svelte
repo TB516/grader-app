@@ -1,22 +1,18 @@
 <script lang="ts">
-  import { searchParams } from 'sv-router';
   import { onMount } from 'svelte';
-  import type { GraderRun, GraderResult } from '../../../shared/types';
+  import type { GraderRun } from '../../../shared/types';
   import GraderResultRow from '../components/GraderResultRow.svelte';
   import ResultsSummary from '../components/ResultsSummary.svelte';
 
   type PageStatus = 'starting' | 'running' | 'completed' | 'cancelled' | 'error';
 
-  const projectUrl = searchParams.get('url');
-  const projectType = searchParams.get('assignment');
+  const query = new URLSearchParams(window.location.search);
+  const projectUrl = query.get('url');
+  const projectType = query.get('assignment');
   const runId = crypto.randomUUID();
   let pageStatus = $state<PageStatus>('starting');
   let errorMessage = $state('');
   let graders = $state<GraderRun[]>([]);
-
-  const completedCount = (): number => graders.filter((run) => run.result !== null && run.result.status !== 'cancelled').length;
-  const statusCount = (status: GraderResult['status']): number => graders.filter((run) => run.result?.status === status).length;
-  const pendingCount = (): number => graders.filter((run) => run.result === null).length;
 
   onMount(() => {
     if (!projectUrl || !projectType) {
@@ -69,15 +65,7 @@
       <p>{errorMessage}</p>
     </section>
   {:else}
-    <ResultsSummary
-      total={graders.length}
-      complete={completedCount()}
-      passed={statusCount('pass')}
-      failed={statusCount('fail')}
-      errors={statusCount('error')}
-      pending={pendingCount()}
-      cancelled={statusCount('cancelled')}
-    />
+    <ResultsSummary {graders} />
 
     {#if graders.length === 0}
       <section class="notice">
@@ -95,25 +83,6 @@
 </main>
 
 <style>
-  :global(*) {
-    box-sizing: border-box;
-  }
-
-  :global(body) {
-    min-width: 720px;
-    color: #f3f4ef;
-    background: #08090b;
-    font-family:
-      Aptos,
-      'Segoe UI Variable',
-      'Segoe UI',
-      ui-sans-serif,
-      system-ui,
-      -apple-system,
-      sans-serif;
-    font-feature-settings: 'ss01' on;
-  }
-
   .results-shell {
     width: min(1180px, calc(100vw - 56px));
     min-height: 100vh;
@@ -198,10 +167,6 @@
   }
 
   @media (max-width: 760px) {
-    :global(body) {
-      min-width: 0;
-    }
-
     .results-shell {
       width: min(100% - 32px, 960px);
       padding: 24px 0;

@@ -9,7 +9,7 @@
     "format": "prettier --write .",
     "lint": "eslint --cache --fix .",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
-    "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
+    "svelte-check": "svelte-check --tsconfig ./tsconfig.test-web.json",
     "typecheck": "pnpm typecheck:node && pnpm typecheck:tests && pnpm svelte-check",
     "dev": "electron-vite dev",
     "build": "pnpm typecheck && electron-vite build",

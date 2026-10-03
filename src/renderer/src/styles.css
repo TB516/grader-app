@@ -1,0 +1,31 @@
+@import './reset.css';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 720px;
+  color: #f3f4ef;
+  background: #08090b;
+  font-family:
+    Aptos,
+    'Segoe UI Variable',
+    'Segoe UI',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-feature-settings: 'ss01' on;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+@media (max-width: 760px) {
+  body {
+    min-width: 0;
+  }
+}
