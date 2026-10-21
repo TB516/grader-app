@@ -4,3 +4,5 @@ allowBuilds:
   esbuild: true
   msw: true
   unrs-resolver: false
+minimumReleaseAgeExclude:
+  - electron@44.9.2
