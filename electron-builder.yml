@@ -1,0 +1,24 @@
+appId: io.github.tb516.grader-app
+productName: Grader
+directories:
+  buildResources: build
+files:
+  - 'out/**'
+  - 'resources/**'
+win:
+  executableName: grader-app
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  notarize: false
+dmg:
+  artifactName: ${name}-${version}.${ext}
+linux:
+  target:
+    - dir
+  category: Education
+npmRebuild: false

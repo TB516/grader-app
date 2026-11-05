@@ -1,0 +1,6 @@
+[tools]
+pnpm = 'latest'
+node = '24'
+
+[settings]
+lockfile = true

@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/@effect/language-service/schema.json",
+  "extends": ["@electron-toolkit/tsconfig/tsconfig.node.json", "./tsconfig.base.json"],
+  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/**/*", "src/shared/**/*"],
+  "compilerOptions": {
+    "types": ["electron-vite/node"],
+    "plugins": [{ "name": "@effect/language-service" }]
+  }
+}

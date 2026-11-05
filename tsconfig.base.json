@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "verbatimModuleSyntax": true,
+
+    // The toolkit base turns this off; strict should include it.
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true
+  }
+}
