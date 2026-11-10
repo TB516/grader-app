@@ -1,0 +1,74 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+
+  --background: #f4f5f6;
+  --surface: #ffffff;
+  --border: #d8dbdf;
+  --text: #1d2125;
+  --muted: #5f666e;
+  --button: #1d2125;
+  --on-button: #ffffff;
+  --passed: #1d7a46;
+  --passed-tint: #e3f2e8;
+  --failed: #b8322a;
+  --failed-tint: #fbe6e4;
+  --error: #8f5a00;
+  --error-tint: #f8edd8;
+  --neutral-tint: #e9ebee;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1b1d20;
+    --surface: #24272b;
+    --border: #383c42;
+    --text: #e8eaed;
+    --muted: #9ba1a9;
+    --button: #e8eaed;
+    --on-button: #1b1d20;
+    --passed: #7bd49c;
+    --passed-tint: #1f3327;
+    --failed: #ff9089;
+    --failed-tint: #3d2422;
+    --error: #f0c06a;
+    --error-tint: #3a3020;
+    --neutral-tint: #2f3337;
+  }
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text);
+  background: var(--background);
+}
+
+button,
+input,
+select {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4375rem 0.875rem;
+  color: inherit;
+  background: var(--surface);
+}
+
+button {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--muted);
+}
+
+button.primary {
+  border-color: var(--button);
+  color: var(--on-button);
+  background: var(--button);
+}
+
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}

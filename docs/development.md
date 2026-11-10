@@ -15,7 +15,7 @@ Tools are managed with [mise](https://mise.jdx.dev). Run `mise install`, then `p
   - `grading/` defines a check, the response helpers checks share, and the grader that runs an assignment's checks and streams the results.
   - `assignments/` has one file per assignment, each a list of checks written against its PDF in `project-pdfs/`.
 - `src/preload/` exposes `window.api` to the renderer.
-- `src/renderer/` is the Svelte UI.
+- `src/renderer/` is the Svelte UI: the launcher, and a results window per submission. `App.svelte` picks the page from the window's `?view=`.
 - `src/shared/` holds the assignment names, the grading event types, and the IPC channel names. It has no Effect code, so the renderer can import it.
 
 A results window's address holds its submission, so the main process keeps no state per window. Each grading run gets its own `MessageChannel`. Closing it, whether by cancelling, reloading, or closing the window, stops the run.

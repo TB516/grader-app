@@ -9,10 +9,12 @@ import icon from '../../resources/icon.png?asset';
  * Opens a window on the renderer page. `query` becomes the page's address parameters: `view` picks
  * the page, and a results window also carries the submission it grades.
  */
-export const createWindow = (query: Record<string, string>): BrowserWindow => {
+export const createWindow = (
+  query: Record<string, string>,
+  size = { width: 900, height: 670 }
+): BrowserWindow => {
   const window = new BrowserWindow({
-    width: 900,
-    height: 670,
+    ...size,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),

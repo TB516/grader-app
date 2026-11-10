@@ -4,6 +4,8 @@ import { app, BrowserWindow } from 'electron';
 import { setupIpc } from './ipc';
 import { createWindow } from './window';
 
+const openLauncher = () => createWindow({ view: 'launcher' }, { width: 560, height: 270 });
+
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('io.github.tb516.grader-app');
 
@@ -13,11 +15,11 @@ app.whenReady().then(() => {
   );
 
   setupIpc();
-  createWindow({ view: 'launcher' });
+  openLauncher();
 
   // macOS keeps the app running without windows, so reopen the launcher from the dock.
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow({ view: 'launcher' });
+    if (BrowserWindow.getAllWindows().length === 0) openLauncher();
   });
 });
 
