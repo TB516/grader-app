@@ -5,7 +5,11 @@ import { BrowserWindow } from 'electron';
 
 import icon from '../../resources/icon.png?asset';
 
-export const createWindow = (): BrowserWindow => {
+/**
+ * Opens a window on the renderer page. `query` becomes the page's address parameters: `view` picks
+ * the page, and a results window also carries the submission it grades.
+ */
+export const createWindow = (query: Record<string, string>): BrowserWindow => {
   const window = new BrowserWindow({
     width: 900,
     height: 670,
@@ -25,9 +29,9 @@ export const createWindow = (): BrowserWindow => {
 
   const rendererUrl = process.env['ELECTRON_RENDERER_URL'];
   if (is.dev && rendererUrl) {
-    void window.loadURL(rendererUrl);
+    void window.loadURL(`${rendererUrl}?${new URLSearchParams(query)}`);
   } else {
-    void window.loadFile(join(__dirname, '../renderer/index.html'));
+    void window.loadFile(join(__dirname, '../renderer/index.html'), { query });
   }
 
   return window;

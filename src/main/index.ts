@@ -1,6 +1,7 @@
 import { electronApp, optimizer } from '@electron-toolkit/utils';
 import { app, BrowserWindow } from 'electron';
 
+import { setupIpc } from './ipc';
 import { createWindow } from './window';
 
 app.whenReady().then(() => {
@@ -11,11 +12,12 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window, { zoom: true })
   );
 
-  createWindow();
+  setupIpc();
+  createWindow({ view: 'launcher' });
 
-  // macOS keeps the app running without windows, so reopen one from the dock.
+  // macOS keeps the app running without windows, so reopen the launcher from the dock.
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0) createWindow({ view: 'launcher' });
   });
 });
 
