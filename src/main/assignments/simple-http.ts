@@ -2,22 +2,11 @@ import { Effect, Schema } from 'effect';
 import { HttpClient } from 'effect/http';
 
 import { CheckFailed, type Check } from '../grading/check';
-import { expectContentType, expectStatus, readJson } from '../grading/response';
+import { expectContentType, expectStatus, getHtml, readJson } from '../grading/response';
 
 const HELLO = 'Hello World';
 
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
-
-const getHtml = Effect.fnUntraced(function* (path: string) {
-  const response = yield* HttpClient.get(path);
-  yield* expectStatus(response, 200);
-  yield* expectContentType(response, 'text/html');
-
-  const html = yield* response.text;
-  if (!html.trim()) return yield* new CheckFailed({ message: `${path} returned an empty page` });
-
-  return html;
-});
 
 const getText = Effect.fnUntraced(function* (path: string) {
   const response = yield* HttpClient.get(path);

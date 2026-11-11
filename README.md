@@ -20,5 +20,6 @@ Grader only sends web requests to the project. It does not read the source code,
 ## Supported assignments
 
 - Simple HTTP
+- HTTP API I
 
 More assignments are being added.

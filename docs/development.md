@@ -28,7 +28,7 @@ A results window's address holds its submission, so the main process keeps no st
 
 A check is an Effect that succeeds with a short summary, fails with `CheckFailed` when the site responds wrongly, or fails with the HTTP client's own error when the site can't be reached. Its `HttpClient` is already pointed at the submission, so checks request paths like `/hello`.
 
-`src/main/grading/response.ts` holds small checks on a response that any assignment can use. Shortcuts that assume one assignment's routes, like "GET this page and expect 200", stay in that assignment's file until another assignment needs the same thing.
+`src/main/grading/response.ts` holds small checks on a response that any assignment can use, such as reading JSON or XML against a schema. Shortcuts that only one assignment needs stay in that assignment's file, and move to `response.ts` once another assignment needs them, as `getHtml` did.
 
 The [Effect language service](https://github.com/Effect-TS/language-service) is a TypeScript plugin set in `tsconfig.node.json`, so editors using the workspace TypeScript show its diagnostics. `pnpm typecheck` also runs them.
 
