@@ -4,14 +4,14 @@ A desktop app that checks a deployed Rich Media Web App Dev II assignment agains
 
 ## Using Grader
 
-1. Open Grader and choose the assignment on the left.
-2. Paste the project's URL (for example `https://my-project.herokuapp.com`) and select **Run Tests**.
-3. A results window opens and fills in as each check finishes. You can grade several projects at once, since each one gets its own window.
+1. Open Grader and choose the assignment.
+2. Enter the site's address (for example `my-project.onrender.com`) and select **Grade**. You can leave off `https://`.
+3. A results window opens and fills in as each check finishes. You can grade several sites at once, since each one gets its own window. In a results window, **Cancel** stops grading, **Run again** grades the site again, and **Copy results** copies a plain-text summary.
 
 Each check shows one of these results:
 
-- **Pass**: the project did what the rubric asks.
-- **Fail**: the project responded, but not the way the rubric asks. Open **Details** to see what came back.
+- **Passed**: the project did what the rubric asks.
+- **Failed**: the project responded, but not the way the rubric asks. Open **Details** to see what came back.
 - **Error**: Grader could not reach the project or read its response. Check that the URL is right and the project is running.
 - **Cancelled**: grading was stopped before the check finished.
 
